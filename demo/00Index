@@ -1,0 +1,5 @@
+pet_ex0	Comparsion of the Ramp and Hamming1 filter in iradon.
+pet_ex1	Comparsion of all direct reconstruction methods without and with AWS.
+pet_ex2	Comparsion of iradonIT (EM, ART, CG) with iradon (FB) without and with AWS.
+pet_ex3	Comparsion of iradonIT (EM, ART, CG) with iradon (FB), without saving of the system matrix (without and with AWS).
+pet_ex4	Using of iradon and iradonIT with ini-files

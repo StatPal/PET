@@ -1,0 +1,2 @@
+useDynLib(PET)
+export(cutMatrix, hough, iniPetFifList, iradon, iradonIT, markPoisson, norm, partEllipse, phantom, radon, readData, readSifData, rotate, scaleImage, viewData, writeData)
