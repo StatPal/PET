@@ -6,13 +6,11 @@
   The function offers the possibility to read a ".txt", ".dat", ".dat.gz", ".pet" or ".fif" file. Furthermore the graphics formats ".tif", ".tiff", ".pgm", ".ppm", ".png", ".pnm", ".gif", ".jpg" and ".jpeg" are supported.
 }
 \usage{
-readData(inputfile, convert.path="convert", DebugLevel = "Normal")
+readData(inputfile, DebugLevel = "Normal")
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{inputfile}{ (character)  \code{inputfile} gives the name of the file to read, including the pathname to the file. The extension of the name of the file specifies the format. Currently ".txt", ".dat", ".dat.gz", ".fif", ".pet" and the graphic formats ".tif", ".tiff", ".pgm", ".ppm", ".png", ".pnm", ".gif", ".jpg" and ".jpeg" are supported. See below to details to get more information about the formats.}
-  \item{convert.path}{ (character)  The parameter \code{convert.path} is only useful in case of a graphic format.  The description of this parameter was taken from R-packet \code{adimpro}. \cr  
-  Windows system calls seem to change environment variable PATH, such that "convert" points to c:\\windows\\system32\\convert.exe instead of ImageMagick-x.x.x\\convert. Therefore here the full path must be provided. Backslash needs to be escaped: c:\\\\programs\\\\imagemagick-6.3.0\\\\convert. }
   \item{DebugLevel}{ (character)  This parameter controls the level of output. Defaults to \code{DebugLevel="Normal"} for a standard level output. Alternative implementations are \code{"Detail"} if it is desirable to show almost all output on screen or \code{"HardCore"} for no information at all. }
 }
 

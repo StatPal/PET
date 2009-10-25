@@ -59,7 +59,7 @@ iniPetFifList <- function(listType="pet", data=NULL, imType="normal")
       iniList <- list()
       length(iniList) <- 4
       names(iniList) <- c("Description", "SignalDim", "XYmin", "DeltaXY")
-      iniList$Description <- "\0"
+      iniList$Description <- "" # OLD: "\0"
       if (matrixTRUE){
           iniList$SignalDim <- dim(data)
           if(imType){ 
@@ -78,8 +78,8 @@ iniPetFifList <- function(listType="pet", data=NULL, imType="normal")
           "SignalDim", "ArrayType", "XYmin", "DeltaXY", "SignalMinMax" )
     
       iniList$FIFIdType <- 17737
-      iniList$FileName <- "\0"
-      iniList$Description <- "\0"
+      iniList$FileName <- ""  # OLD: "\0"
+      iniList$Description <- ""  # OLD: "\0"
       iniList$Date <- as.character(Sys.Date()) #format(Sys.Date(), "%d%m%y")
       iniList$ArrayType <- 1
       if (matrixTRUE){

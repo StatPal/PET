@@ -12,7 +12,7 @@
 #
 #########################################################################
 writeData <- function(data, outputfile, fileHeader=NULL, imType="normal",
-                      convert.path = "convert", DebugLevel="Normal")
+                      DebugLevel="Normal")
 {
 # ========================================================================
 #
@@ -33,12 +33,6 @@ writeData <- function(data, outputfile, fileHeader=NULL, imType="normal",
 #          default values of \code{fileHeader}. Default is \code{imType="normal"}. 
 #          Also implemented is \code{imType="radon"}, i.e. that the image is a 
 #          sinogram (radon transformed image).
-# convert.path (character)  Windows system calls seem to change environment
-#          variable PATH, such that "convert" points to
-#          c:\windows\system32\convert.exe instead of
-#          ImageMagick-x.x.x\convert. Therefore here the full path must
-#          be provided. Backslash needs to be escaped:
-#          c:\\programs\\imagemagick-6.3.0\\convert
 # DebugLevel (character)  This parameter controls the level of output. Following
 #          possibilities are available: The default "Normal" for standard level of
 #          output to screen or alternative "Detail" if it desirable to logged 
@@ -193,7 +187,7 @@ writeData <- function(data, outputfile, fileHeader=NULL, imType="normal",
    #     different graphic-formats supported by the adimpro library
     require(adimpro)
     data <- make.image(scaleImage(data, mode="max"), gamma=TRUE, compress=FALSE)
-    write.image(data, file=outputfile, convert.path=convert.path)
+    write.image(data, file=outputfile)
     #require(edges)
     #write.image(img=data, file=outputfile, depth=16)
 

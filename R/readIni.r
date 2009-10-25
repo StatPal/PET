@@ -163,7 +163,7 @@ if (mode %in% c("FB", "BF", "CNF", "CBF", "CC", "CNC", "CBC", "Test")){
     # checking the following parameters:
     # XSamples, YSamples, XMin, YMin, DeltaX and DeltaY
     if ( !(is.null(iniList$oData)) && fformatOrginal %in% c("pet", "fif", "dat")){
-        if(DL1) cat("Setting unknown parameters from '", ofile, "' \n", sep="")
+        if(DL1) cat("Setting unknown parameters from '", sfile, "' \n", sep="")
         # check XSamples
         if(is.null(iniList$XSamples)){
             iniList$XSamples <- iniList$oData$Header$SignalDim[[1]]
@@ -171,7 +171,7 @@ if (mode %in% c("FB", "BF", "CNF", "CBF", "CC", "CNC", "CBC", "Test")){
                 cat("'XSamples' entry is set to", iniList$XSamples, "\n")
         } else if (iniList$oData$Header$SignalDim[[1]] != iniList$XSamples){
             if(DL2)
-                cat("Note: 'XSamples' is different between '", fileName, "' and '", ofile, "'. INI-file is preferred. \n", sep="")
+                cat("Note: 'XSamples' is different between '", fileName, "' and '", sfile, "'. INI-file is preferred. \n", sep="")
         }
         # check YSamples
         if(is.null(iniList$YSamples)){
@@ -180,7 +180,7 @@ if (mode %in% c("FB", "BF", "CNF", "CBF", "CC", "CNC", "CBC", "Test")){
                 cat("'YSamples' entry is set to", iniList$YSamples, "\n")
         } else if (iniList$oData$Header$SignalDim[[2]] != iniList$YSamples){
             if(DL2)
-                cat("Note: 'YSamples' is different between '", fileName, "' and '", ofile, "'. INI-file is preferred. \n", sep="")
+                cat("Note: 'YSamples' is different between '", fileName, "' and '", sfile, "'. INI-file is preferred. \n", sep="")
         }
         # check Xmin
         if(is.null(iniList$Xmin)){
@@ -189,7 +189,7 @@ if (mode %in% c("FB", "BF", "CNF", "CBF", "CC", "CNC", "CBC", "Test")){
                 cat("'Xmin' entry is set to", iniList$Xmin, "\n")
         } else if (iniList$oData$Header$XYmin[[1]] != iniList$Xmin){
             if(DL2)
-                cat("Note: 'Xmin' is different between '", fileName, "' and '", ofile, "'. INI-file is preferred. \n", sep="")
+                cat("Note: 'Xmin' is different between '", fileName, "' and '", sfile, "'. INI-file is preferred. \n", sep="")
         }
         # check Ymin
         if(is.null(iniList$Ymin)){
@@ -198,7 +198,7 @@ if (mode %in% c("FB", "BF", "CNF", "CBF", "CC", "CNC", "CBC", "Test")){
                 cat("'Ymin' entry is set to", iniList$Ymin, "\n")
         } else if (iniList$oData$Header$XYmin[[2]] != iniList$Ymin){
             if(DL2)
-                cat("Note: 'Ymin' is different between '", fileName, "' and '", ofile, "'. INI-file is preferred. \n", sep="")
+                cat("Note: 'Ymin' is different between '", fileName, "' and '", sfile, "'. INI-file is preferred. \n", sep="")
         }
         # check DeltaX
         if(is.null(iniList$DeltaX)){
@@ -207,7 +207,7 @@ if (mode %in% c("FB", "BF", "CNF", "CBF", "CC", "CNC", "CBC", "Test")){
                 cat("'DeltaX' entry is set to", iniList$DeltaX, "\n")
         } else if (iniList$oData$Header$DeltaXY[[1]] != iniList$DeltaX){
             if(DL2)
-                cat("Note: 'DeltaX' is different between '", fileName, "' and '", ofile, "'. INI-file is preferred. \n", sep="")
+                cat("Note: 'DeltaX' is different between '", fileName, "' and '", sfile, "'. INI-file is preferred. \n", sep="")
         }
         # check DeltaY
         if(is.null(iniList$DeltaY)){
@@ -216,7 +216,7 @@ if (mode %in% c("FB", "BF", "CNF", "CBF", "CC", "CNC", "CBC", "Test")){
                 cat("'DeltaY' entry is set to", iniList$DeltaY, "\n")
         } else if (iniList$oData$Header$DeltaXY[[2]] != iniList$DeltaY){
             if(DL2)
-                cat("Note: 'DeltaY' is different between '", fileName, "' and '", ofile, "'. INI-file is preferred. \n", sep="")
+                cat("Note: 'DeltaY' is different between '", fileName, "' and '", sfile, "'. INI-file is preferred. \n", sep="")
         }
         iniList$oData <- iniList$oData$Signal
         if(DL2) cat("\n")

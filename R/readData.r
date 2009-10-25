@@ -11,7 +11,7 @@
 # Stand:         15.08.2006
 #
 #########################################################################
-readData <- function(inputfile, convert.path="convert", DebugLevel="Normal")
+readData <- function(inputfile, DebugLevel="Normal")
 {
 # ========================================================================
 #
@@ -22,12 +22,6 @@ readData <- function(inputfile, convert.path="convert", DebugLevel="Normal")
 #            ".tif", ".tiff", ".pgm", ".ppm", ".png", ".pnm", ".gif", 
 #            ".jpg" and ".jpeg". See below to details to get more 
 #            information about the formats.}
-# convert.path (character) Windows system calls seem to change environment 
-#            variable PATH, such that "convert" points to
-#            c:\windows\system32\convert.exe instead of
-#            ImageMagick-x.x.x\convert. Therefore here the full path must
-#            be provided. Backslash needs to be escaped:
-#            c:\\programs\\imagemagick-6.3.0\\convert
 # DebugLevel (character)  This parameter controls the level of output. 
 #            Following possibilities are available: The default "Normal" 
 #            for standard level of output to screen or alternative "Detail" 
@@ -84,7 +78,7 @@ readData <- function(inputfile, convert.path="convert", DebugLevel="Normal")
    ####################################################################
    #     different graphic-formats supported by the adimpro library
     require(adimpro)
-    fdata <- read.image(inputfile, compress=FALSE, convert.path=convert.path)$img
+    fdata <- read.image(inputfile, compress=FALSE)$img
     #require(edges)
     #fdata <- read.image(inputfile)
 

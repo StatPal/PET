@@ -1,7 +1,7 @@
 \name{norm}
 \alias{norm}
 %- Also NEED an '\alias' for EACH other topic documented here.
-\title{ L1 and L2 norm }
+\title{L1 and L2 norm}
 \description{
   Computes the L1 or L2 norm between two vectors or matrices.
 }

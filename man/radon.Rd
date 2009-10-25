@@ -1,7 +1,7 @@
 \name{radon}
 \alias{radon}
 %- Also NEED an '\alias' for EACH other topic documented here.
-\title{ Radon Transformation }
+\title{Radon Transformation}
 \description{
   This function will forward project (normal Radon transformation) a quadratic image into a sinogram.
 }
@@ -21,7 +21,8 @@ radon(oData, mode="NN", XYSamples=nrow(oData),
   \item{XYmin}{ (double)  Specifies the minimum sample position in the image on the first and second axis. If not given, the image is centered around the middle. Defaults to \code{XYmin=-0.5*(nrow(oData)-1)}. }
   \item{DeltaXY}{ (double)  Specifies the sampling distance of both axes in the image. Defaults to \code{DeltaXY=1}. }
   \item{ThetaSamples}{ (integer)  Specifies the number of samples in the angular parameter \eqn{\theta}{theta} in the sinogram. The sinogram is sampled linearly from \eqn{0} to (approximately) \eqn{\pi}{pi} radians. Defaults to \code{ThetaSamples=181}. }
-  \item{RhoSamples}{ (integer)  Specifies the number of samples in the distance parameter \eqn{\rho}{rho} in the sinogram. Should be an odd number. Defaults to \code{RhoSamples = 2*round(sqrt(sum((dim(oData))^2))/2)+1}. }
+  \item{RhoSamples}{ (integer)  Specifies the number of samples in the distance parameter \eqn{\rho}{rho} in the sinogram. Should be an odd number. \cr
+  Defaults to \code{RhoSamples = 2*round(sqrt(sum((dim(oData))^2))/2)+1}. }
   \item{ThetaMin}{ (double)  Specifies the minimum sample position in the sinogram on the first axis. Defaults to \code{ThetaMin=0}. }
   \item{RhoMin}{ (double)  Specifies the minimum sample position in the sinogram on the second axis. Defaults to \code{RhoMin=-0.5*((2*round(sqrt(sum((dim(oData))^2))/2)+1)-1)}. }
   \item{DeltaTheta}{ (double)  Angular sampling distance. Defaults to \code{DeltaTheta=pi/ThetaSamples}. }

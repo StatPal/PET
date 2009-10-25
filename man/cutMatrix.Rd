@@ -1,7 +1,7 @@
 \name{cutMatrix}
 \alias{cutMatrix}
 %- Also NEED an '\alias' for EACH other topic documented here.
-\title{ Cut Matrix }
+\title{Cut Matrix}
 \description{
   Scale the minimum of a matrix to 0 and cut off the first and the last rows or columns where the added up values are less than \eqn{1e-10}.
 }

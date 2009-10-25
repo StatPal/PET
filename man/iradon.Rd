@@ -1,7 +1,7 @@
 \name{iradon}
 \alias{iradon}
 %- Also NEED an '\alias' for EACH other topic documented here.
-\title{Inverse Radon Transformation }
+\title{Direct Inverse Radon Transformation}
 \description{
 The function implements different direct reconstruction methods for a radon transformed two-dimensional image.
 }
@@ -23,8 +23,10 @@ iradon(rData, XSamples, YSamples, mode = "FB",
   \item{mode}{ (character) The reconstruction method. Default is \code{mode="FB"} for Filtered Backprojection. Also implemented are \code{"BF"} for Filtering After Backprojection, \code{"CNF"} for Central Slice (FFT based with Nearest Neighbour approximation), \code{"CBF"} for Central Slice (FFT based with Bilinear Interpolation), \code{"CC"}  for using a variation of the Central Slice (by the use of nonlinear sampling of the Radon domain with the use of the Chirp-z algorithm, the interpolation can be reduced to a simple one  dimensional linear interpolation compared to normal CS), \code{"CNC"} for Central Slice (Chirp-z based with Nearest Neighbour approximation),  \code{"CBC"} for Central Slice (Chirp-z based with Bilinear Interpolation) and \code{"Test"} to run all available reconstruction  routines on the same image and to compare with a L1-Norm and L2-Norm. In case of \code{"Test"} the surrender value is \code{NULL}. }
   \item{Xmin}{ (double) The minimum x-position of the reconstructed image. Defaults to \code{Xmin=-sqrt(0.5)*(ncol(rData)/XSamples)*0.5*(XSamples-1)}. }
   \item{Ymin}{ (double) The minimum y-position of the reconstructed image. Defaults to \code{Ymin=-sqrt(0.5)*(ncol(rData)/YSamples)*0.5*(YSamples-1)}. }
-  \item{DeltaX}{ (double) Sampling distance on the x-axis. Defaults set to \code{DeltaX = sqrt(0.5)*(ncol(rData)/XSamples)}. }
-  \item{DeltaY}{ (double) Sampling distance on the y-axis. Defaults set to \code{DeltaY = sqrt(0.5)*(ncol(rData)/YSamples)}. }
+  \item{DeltaX}{ (double) Sampling distance on the x-axis. \cr
+  Defaults set to \code{DeltaX = sqrt(0.5)*(ncol(rData)/XSamples)}. }
+  \item{DeltaY}{ (double) Sampling distance on the y-axis. \cr
+  Defaults set to \code{DeltaY = sqrt(0.5)*(ncol(rData)/YSamples)}. }
   \item{InterPol}{ (integer) Interpolation level. Used by Filtered Backprojection. Defaults \code{InterPol=1}. }
   \item{FilterTyp}{ (character) Filter type is only used by Filtered Backprojection (\code{"FB"}). Defaults to \code{FilterTyp="Hamming1"} for generalized Hamming Filter with \eqn{\alpha=0.5}. The alternative choice is \code{"Hamming2"} for generalized Hamming Filter with \eqn{\alpha=0.54} or a \code{"Ramp"} to get very good results of data without noise. }
   \item{oData}{ (matrix) If \code{mode="Test"}, measures of misfit can be made between \code{rData} and \code{oData}. \code{oData} is the original image of the radon transformed data. Defaults to \code{oData=NULL}. }

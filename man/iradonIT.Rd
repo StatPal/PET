@@ -1,7 +1,7 @@
 \name{iradonIT}
 \alias{iradonIT}
 %- Also NEED an '\alias' for EACH other topic documented here.
-\title{ Inverse Radon Transformation }
+\title{Iterative Inverse Radon Transformation}
 \description{
 The function implements three of the major iterative reconstruction techniques: ART (Algebraic Reconstruction Technique), EM (Likelihood Reconstruction using Expectation Maximization) and LSCG (Least Squares Conjugate Method). 
 }
@@ -47,10 +47,12 @@ NOTE: For both limit it is assumed that negative limits imply that the feature i
   \item{KernelFileSave}{ (logical)  If \code{KernelFileSave=1} and fast reconstruction is used, the system matrix will be saved under the name \code{KernelFileName}. Defaults to \code{KernelFileSave=0}. }
   \item{KernelFileName}{ (character)  If fast reconstruction is used, the system matrix will be saved and restored with this sif-name. If the system matrix is incompatible to the sampling parameters, a new one will be generated. KernelFileName contains the path to the filename and the filename. The path contains the path relatively to the working-directory of your R-session or it contains the full path to the file.  Defaults to \code{KernelFileName=""}. }
   \item{RefFileName}{ (character)  Error measures can be made between the image which is contained in \code{RefFileName} and the reconstructed image from \code{rData}. The file has to be either a fif-file or a pet-file (type \code{?writeData} or \code{?readData} in R to get more information about these formats). If \code{RefFileName} exists, the measures will be logged in a file with the name of \code{RefFileName} and extension 'dif'. Defaults to \code{RefFileName="None"}. }
-  \item{ThetaSamples}{ (integer)  Number of angular samples \eqn{\theta} in the sinogram.  Defaults to \code{ThetaSamples=nrow(rData)}. }
+  \item{ThetaSamples}{ (integer)  Number of angular samples \eqn{\theta} in the sinogram. \cr
+  Defaults to \code{ThetaSamples=nrow(rData)}. }
   \item{RhoSamples}{ (integer)  Number of samples in the sinogram \eqn{\rho} in the \eqn{\rho}-direction. Defaults to \code{RhoSamples=ncol(rData)}. }
   \item{ThetaMin}{ (double)  Start of the angular sampling (should be set to zero).  Defaults to \code{ThetaMin=0}. }
-  \item{RhoMin}{ (double)  Start of sampling positions in \eqn{\rho}{rho}.  Defaults to \code{RhoMin=-0.5*} \code{((2*round(sqrt(XSamples^2+YSamples^2)/2)+1)-1)}. }
+  \item{RhoMin}{ (double)  Start of sampling positions in \eqn{\rho}{rho}.  \cr
+  Defaults to \code{RhoMin=-0.5*} \code{((2*round(sqrt(XSamples^2+YSamples^2)/2)+1)-1)}. }
   \item{DeltaTheta}{ (double)  Angular sampling distance. Should be set to the default \code{DeltaTheta = pi/ThetaSamples}. }
   \item{DeltaRho}{ (double)  Sampling distance in \eqn{\rho}{rho}. Defaults to \code{DeltaRho=(2*abs(RhoMin)+1)/RhoSamples}. }
   \item{Xmin}{ (double)  The minimum \eqn{x}-position of the reconstructed image. Defaults to \code{Xmin=-0.5*(XSamples-1)}. }

@@ -1,15 +1,15 @@
 \name{hough}
 \alias{hough}
 %- Also NEED an '\alias' for EACH other topic documented here.
-\title{ Hough Transformation }
+\title{Hough Transformation}
 \description{
   The function implements a Hough transformation for an image.
 }
 \usage{
 hough(oData, mode=1, XYSamples=nrow(oData), DeltaXY=1.0, 
       XYmin=-0.5*DeltaXY*(XYSamples-1), ThetaSamples=181, 
-      RhoSamples=2*round(sqrt(sum((dim(oData))^2))/2)+1,
-      ThetaMin=0, RhoMin=-0.5*((2*round(sqrt(sum((dim(oData))^2))/2)+1)-1),
+      RhoSamples=2*round(sqrt(sum((dim(oData))^2))/2)+1, ThetaMin=0,
+      RhoMin=-0.5*((2*round(sqrt(sum((dim(oData))^2))/2)+1)-1),
       DeltaTheta=pi/ThetaSamples, DeltaRho=(2*abs(RhoMin)+1)/RhoSamples,       
       DebugLevel = "Normal")
 }
@@ -21,9 +21,11 @@ hough(oData, mode=1, XYSamples=nrow(oData), DeltaXY=1.0,
   \item{DeltaXY}{ (double)  Specifies the sampling distance of both axes in the image. Defaults to \code{DeltaXY=1}. }
   \item{XYmin}{ (double)  Specifies the minimum sample position in the image on the first and second axis. If not given, the image is centered around the middle. Defaults to \code{XYmin=-0.5*DeltaXY*(XYSamples-1)}. }
   \item{ThetaSamples}{ (integer)  Specifies the number of samples in the angular parameter \eqn{\theta}{theta} in the Hough transformation image. It is sampled linearly from \eqn{0} to (approximately) \eqn{\pi}{pi} radians. Defaults to \code{ThetaSamples=181}. }
-  \item{RhoSamples}{ Specifies the number of samples in the distance parameter \eqn{\rho}{rho} in the Hough transformation image. Defaults to \code{RhoSamples=2*round(sqrt(sum((dim(oData))^2))/2)+1}. }
+  \item{RhoSamples}{ Specifies the number of samples in the distance parameter \eqn{\rho}{rho} in the Hough transformation image. \cr
+  Defaults to \code{RhoSamples=2*round(sqrt(sum((dim(oData))^2))/2)+1}. }
   \item{ThetaMin}{ (double)  Specifies the minimum sample position in the Hough transformation image on the first axis. Defaults to \code{ThetaMin=0}. }
-  \item{RhoMin}{ (double)  Specifies the minimum sample position in the Hough transformation image on the second axis. Defaults to \code{RhoMin=-0.5*((2*round(sqrt(sum((dim(oData))^2))/2)+1)-1)}. }
+  \item{RhoMin}{ (double)  Specifies the minimum sample position in the Hough transformation image on the second axis. \cr
+  Defaults to \code{RhoMin=-0.5*((2*round(sqrt(sum((dim(oData))^2))/2)+1)-1)}. }
   \item{DeltaTheta}{ (double)  Angular sampling distance. Defaults to \code{DeltaTheta=pi/ThetaSamples}. }
   \item{DeltaRho}{ (double)  Specifies the sampling distance in \eqn{\rho}{rho}. The program will center the sampling points around \eqn{0}. Defaults to \code{DeltaRho=(2*abs(RhoMin)+1)/RhoSamples} }
   \item{DebugLevel}{ (character)  This parameter controls the level of output. Defaults to \code{DebugLevel="Normal"} for a standard level output. Alternative implementations are \code{"Detail"} if it is desirable to show almost all output on screen or \code{"HardCore"} for no information at all. }

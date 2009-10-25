@@ -112,7 +112,7 @@ readSifData <- function(filename, DebugLevel="Normal")
     SparseIndex[[i]] <- readBin( con, integer(), n=MIndexNumber[i], size=4 )
     SparseSignal[[i]] <- readBin( con, numeric(), n=MIndexNumber[i], size=4 )
   }
-  if  (pcType==1 || pcTypr==2) if(DL1) cat("\n")
+  if  (pcType==1 || pcType==2) if(DL1) cat("\n")
 
  ##################################################################
  # Return reading values as list
