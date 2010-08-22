@@ -1,0 +1,22 @@
+Update information
+
+Modifications in Version: 0.4.7
+
+- (25.10.2009) 'Description': Adjusment to the licence definition (GPL >= 2) as required.
+- (25.10.2009) 'PET-package.Rd': New.
+- (27.10.2009) 'readData.r' and 'writeData.r': convert.path variable is not used anymore in package 'adimpro'.
+- (27.10.2009) 'readData.rd' and 'writeData.rd': Adjustment because of point before.
+- (27.10.2009) 'readSifData.r': Correction of typing error 'pcTypr' to 'pcType'.
+- (27.10.2009) 'readIni.r': Correction of typing error 'ofile' to 'sfile'.
+- (27.10.2009) 'iniPetFifList.r': Changing of "\0" in "" three times. "\0" is a not valid
+                   R notation anymore.
+
+Modifications in Version: 0.4.8
+
+- (28.10.2009) Modification in ./src/imgtools.c (functions: ReadPET, ReadFIFHeader, ReadFIF, ReadAnalyze) and ./src/sparse.c (functions: ReadSIFHeader, ReadSIF) because of gcc warning: "ignoring return value of ‘fread’, declared with attribute warn_unused_result" before. The C function 'fread' has a return value which was not assigned to a variable before. Now 'fread' will be assigned to variable 'result' (size_t result) everytime.
+
+Modifications in Version: 0.4.9
+
+- (22.08.2010) 'readData.Rd': Modification in the example.
+- (22.08.2010) 'writeData.r': Implementation of the parameter fileOverwrite.
+- (22.08.2010) 'writeData.rd': Just update because modification, see before.

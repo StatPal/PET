@@ -12,7 +12,7 @@
 #
 #########################################################################
 writeData <- function(data, outputfile, fileHeader=NULL, imType="normal",
-                      DebugLevel="Normal")
+                      fileOverwrite="ASK",DebugLevel="Normal")
 {
 # ========================================================================
 #
@@ -33,6 +33,10 @@ writeData <- function(data, outputfile, fileHeader=NULL, imType="normal",
 #          default values of \code{fileHeader}. Default is \code{imType="normal"}. 
 #          Also implemented is \code{imType="radon"}, i.e. that the image is a 
 #          sinogram (radon transformed image).
+# fileOverwrite (character) Control the behaviour for overwriting a file. Supported
+#          are "NO", "YES" and "ASK". If fileOverwrite = "ASK" the routine
+#          will ask you in case of an existing outputfile with this name. Default
+#          is "ASK".
 # DebugLevel (character)  This parameter controls the level of output. Following
 #          possibilities are available: The default "Normal" for standard level of
 #          output to screen or alternative "Detail" if it desirable to logged 
@@ -49,10 +53,16 @@ writeData <- function(data, outputfile, fileHeader=NULL, imType="normal",
     stop("'outputfile' have to be of type character.")
   if (length(outputfile) != 1)
     stop("Please specify exactly one 'outputfile'.")
+  if (is.na(match(fileOverwrite,c("ASK","YES","NO")))){
+	 cat("WARNING: Parameter fileOverwrite= '", fileOverwrite, "' is not supported. Default parameter is used. \n",sep="")
+	 fileOverwrite = "ASK";
+  }
   if (!(file.access(outputfile, 0))){
-    cat("WARNING: The file, '", outputfile, "' exist. If you like to \n",sep="")
-    cat("overwrite the file then type 'Yes' and enter. \n")
-    fileOverwrite <- readLines(n=1)
+	if (toupper(fileOverwrite) == "ASK"){
+	  cat("WARNING: The file, '", outputfile, "' exist. If you like to \n",sep="")
+	  cat("overwrite the file then type 'Yes' and enter. \n")
+	  fileOverwrite <- readLines(n=1)
+    } 
     if (!(toupper(fileOverwrite) == "YES")) 
         stop("The routine breaking off, beause it was given no permission to write.")
     if (file.access(outputfile, 2))

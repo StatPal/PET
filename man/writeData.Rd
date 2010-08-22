@@ -7,7 +7,7 @@
 }
 \usage{
 writeData(data, outputfile,  fileHeader = NULL, imType = "normal",
-          DebugLevel = "Normal")
+          fileOverwrite = "ASK", DebugLevel = "Normal")
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -15,6 +15,7 @@ writeData(data, outputfile,  fileHeader = NULL, imType = "normal",
   \item{outputfile}{ (character)  \code{outputfile} naming the file to write to, including the pathname. The path has to be given relatively to the working-directory of your R-session or it contains the full path of the file. The extension of the filename specifies the format. Currently, ".txt", ".dat", ".dat.gz", ".fif", ".pet" and the graphic formats ".tif", ".tiff", ".pgm", ".ppm", ".png", ".pnm", ".gif", ".jpg" and ".jpeg" are supported. See below to details to get more information about these formats.}
   \item{fileHeader}{ (list)  If the file format "is .dat", ".dat.gz", ".pet" or ".fif", then \code{fileHeader} is necessary. If in these cases \code{fileHeader=NULL}, default values will be generated dependent on \code{imType}. See below to details to get more information. }
   \item{imType}{ (character)  \code{imType} specifies the type of \code{data} and thus the default values of \code{fileHeader}. Default is \code{imType="normal"}. Additional implementation is \code{imType="radon"}, i.e. that the image is a sinogram (Radon transformed image). }
+  \item{fileOverwrite}{ (character)  Control the behaviour for overwriting a file. Supported are "NO", "YES" and "ASK". If fileOverwrite = "ASK" the routine will ask you in case of an existing outputfile with this name. Default is "ASK". }
   \item{DebugLevel}{ (character)  This parameter controls the level of output. Defaults to \code{DebugLevel="Normal"} for a standard level output. Alternative implementations are \code{"Detail"} if it is desirable to show almost all output on screen or \code{"HardCore"} for no information at all. }
 }
 \details{

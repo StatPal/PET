@@ -597,12 +597,14 @@ returns the parameters to {\tt TestINI}.
 Dec. 94, JJJ and PT\\
 March 96 PT
 Mar 02/07 J.Schulz Memory allocation by R (Calloc)
+Oct 28/09 J. Schulz Addition of "result=" to fread
 ***************************************************************/
 itINItype *ReadSIFHeader(char* filename)
 {
   FILE *infile;
   char infilename[100]; 
   itINItype *MyitINI;
+  size_t result;
 
   MyitINI=(itINItype *)Calloc(1, itINItype);
 
@@ -611,7 +613,12 @@ itINItype *ReadSIFHeader(char* filename)
   if(!(infile=fopen(infilename,"rb")))
     Error("Error opening file: '%s'",infilename);
 
-  fread(MyitINI,sizeof(itINItype),1,infile);  
+  // Note: "result" is not used but without this declaration
+  //   I got the message "warning: "ignoring return value of ‘fread’, 
+  //   declared with attribute warn_unused_result" from the gcc compiler.
+  result=fread(MyitINI,sizeof(itINItype),1,infile);
+  
+  
   fclose(infile);
 
   return MyitINI;
@@ -637,7 +644,8 @@ returned in {\tt MyitINI}. A pointer to the sparse matrix is returned.
 Reads the file ``testmatrix.sif'' into {\tt TestMatrix}.
 
 [REVISION]
-Dec. 94, JJJ and PT
+Dec. 94,    JJJ and PT
+Oct. 28/09  Joern Schulz, Addition of "result=" to fread
 ***************************************************************/
 SparseMatrix *ReadSIF(itINItype *MyitINI, char* filename)
 {
@@ -646,15 +654,19 @@ SparseMatrix *ReadSIF(itINItype *MyitINI, char* filename)
   char infilename[100]; 
   SparseVector *tempV;
   SparseMatrix *tempM;
+  size_t result;
 
   strcpy(infilename,filename);
   strcat(infilename,".sif");
   if(!(infile=fopen(infilename,"rb")))
     Error("Error opening file: '%s'",infilename);
 
-  fread(MyitINI,sizeof(itINItype),1,infile);  
-  fread(&M,sizeof(int),1,infile);
-  fread(&N,sizeof(int),1,infile);
+  // Note: "result" is not used but without this declaration
+  //   I got the message "warning: "ignoring return value of ‘fread’, 
+  //   declared with attribute warn_unused_result" from the gcc compiler.
+  result=fread(MyitINI,sizeof(itINItype),1,infile);  
+  result=fread(&M,sizeof(int),1,infile);
+  result=fread(&N,sizeof(int),1,infile);
 
   tempM=InitSparseMatrix(M,N);
 
@@ -662,12 +674,12 @@ SparseMatrix *ReadSIF(itINItype *MyitINI, char* filename)
           infilename,tempM->M,tempM->N);
 
   tempNm=IntVector(tempM->M);
-  fread(tempNm,sizeof(int)*tempM->M,1,infile);
+  result=fread(tempNm,sizeof(int)*tempM->M,1,infile);
   
   for(m=0;m<tempM->M;m++) {
     tempV=InitSparseVector(tempNm[m]);
-    fread(tempV->index,sizeof(int)*tempNm[m],1,infile);
-    fread(tempV->value,sizeof(float)*tempNm[m],1,infile);
+    result=fread(tempV->index,sizeof(int)*tempNm[m],1,infile);
+    result=fread(tempV->value,sizeof(float)*tempNm[m],1,infile);
     InsertSparseVector(tempM,tempV,m);
   }
   fclose(infile);

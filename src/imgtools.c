@@ -992,6 +992,7 @@ Reads the image {\tt Test.pet} and return it in {\tt Test}.
 
 [REVISION]
 July 2006, Joern Schulz.
+Oct. 2009, Joern Schulz, Addition of 'result=' to.fread.
 ***************************************************************************/
 Image * ReadPET(char *FileName)
 {
@@ -1001,6 +1002,7 @@ Image * ReadPET(char *FileName)
   FILE *InFile;
   char InFileName[100];
   Image *NewImage;
+  size_t result;
 
   strcpy(InFileName,FileName);
   strcat(InFileName,".pet");
@@ -1011,13 +1013,16 @@ Image * ReadPET(char *FileName)
     Error("Error opening file: `%s'",InFileName);
   
   // Value that reading from the file-header
-  fread(&Description,sizeof(char[80]),1,InFile);
-  fread(&M,sizeof(int),1,InFile);
-  fread(&N,sizeof(int),1,InFile);
-  fread(&Xmin,sizeof(float),1,InFile);
-  fread(&Ymin,sizeof(float),1,InFile);
-  fread(&DeltaX,sizeof(float),1,InFile);
-  fread(&DeltaY,sizeof(float),1,InFile);
+  // Note: "result" is not used but without this declaration
+  //   I got the message "warning: "ignoring return value of ‘fread’, 
+  //   declared with attribute warn_unused_result" from the gcc compiler.
+  result = fread(&Description,sizeof(char[80]),1,InFile);
+  result = fread(&M,sizeof(int),1,InFile);
+  result = fread(&N,sizeof(int),1,InFile);
+  result = fread(&Xmin,sizeof(float),1,InFile);
+  result = fread(&Ymin,sizeof(float),1,InFile);
+  result = fread(&DeltaX,sizeof(float),1,InFile);
+  result = fread(&DeltaY,sizeof(float),1,InFile);
   
   NewImage=NewFloatImage(FileName,M,N,_RealArray);
   
@@ -1131,7 +1136,8 @@ The Image structure returned by this function must not be freed by {\tt
 
 [REVISION] 
 Dec. 94, JJJ and PT
-Mar 02/07 J.Schulz Memory allocation by R (Calloc)
+Mar  02/07 J.Schulz Memory allocation by R (Calloc)
+Oct. 28/09 J.Schulz, Addition of 'result=' to fread
 ***************************************************************************/
 Image *ReadFIFHeader(char *FileName)
 {
@@ -1139,6 +1145,7 @@ Image *ReadFIFHeader(char *FileName)
   FILE *InFile;
   char InFileName[100];
   Image *NewImage;
+  size_t result;
 
   DoConvert=FALSE;
     
@@ -1152,8 +1159,11 @@ Image *ReadFIFHeader(char *FileName)
   
   if(!(NewImage=(Image *) Calloc(1, Image))) 
     Error( "\nMemory allocation problems (ReadFIFHeader)\n" );
-
-  fread(NewImage,sizeof(Image),1,InFile);
+  
+  // Note: "result" is not used but without this declaration
+  //   I got the message "warning: "ignoring return value of ‘fread’, 
+  //   declared with attribute warn_unused_result" from the gcc compiler.
+  result=fread(NewImage,sizeof(Image),1,InFile);
 
   if(NewImage->FIFIdType!=_00EI) {
     DoConvert=TRUE;
@@ -1200,7 +1210,8 @@ Reads the image {\tt Test.fif} and return the pointer in {\tt Test}.
 
 [REVISION]
 Oct. 94, JJJ and PAP
-Mar 02/07 J.Schulz Memory allocation by R (Calloc)
+Mar  02/07 J.Schulz Memory allocation by R (Calloc)
+Oct. 28/09 J.Schulz, Addition of 'result=' to fread
 ***************************************************************************/
 Image * ReadFIF(char *FileName)
 {
@@ -1208,6 +1219,7 @@ Image * ReadFIF(char *FileName)
   FILE *InFile;
   char InFileName[100];
   Image *NewImage,*TempImage;
+  size_t result;
 
   DoConvert=FALSE;
     
@@ -1221,8 +1233,11 @@ Image * ReadFIF(char *FileName)
   
   if(!(NewImage=(Image *) Calloc(1, Image))) 
     Error( "\nMemory allocation problems (ReadFIF)\n" );
-
-  fread(NewImage,sizeof(Image),1,InFile);
+  
+  // Note: "result" is not used but without this declaration
+  //   I got the message "warning: "ignoring return value of ‘fread’, 
+  //   declared with attribute warn_unused_result" from the gcc compiler.
+  result = fread(NewImage,sizeof(Image),1,InFile);
 
   if(NewImage->FIFIdType!=_00EI) {
     DoConvert=TRUE;
@@ -1588,6 +1603,7 @@ return it in {\tt Test}. The first sinogram is read.
 [REVISION]
 Oct. 94, PAP\\
 Dec. 9, PAP and PT
+Oct. 28/09 J.Schulz, Addition of 'result=' to fread
 ***************************************************************************/
 Image * ReadAnalyze(char *FileName,int LayerNumber)
 {
@@ -1597,6 +1613,7 @@ Image * ReadAnalyze(char *FileName,int LayerNumber)
   Image *NewImage;
   float ScaleFactor,OffSet;
   dsr AnalyzeHeader;
+  size_t result;
 
 Print(_DNormal,"LA=%d\n",LayerNumber);  
   if (LayerNumber<0) {
@@ -1611,7 +1628,10 @@ Print(_DNormal,"LA=%d\n",LayerNumber);
   if(!(InFile=fopen(InFileName,"rb")))	
     Error("Error opening file: '%s'",InFileName);
   
-  fread(&AnalyzeHeader,sizeof(dsr),1,InFile);
+  // Note: "result" is not used but without this declaration
+  //   I got the message "warning: "ignoring return value of ‘fread’, 
+  //   declared with attribute warn_unused_result" from the gcc compiler.
+  result=fread(&AnalyzeHeader,sizeof(dsr),1,InFile);
 
   fclose(InFile);
 

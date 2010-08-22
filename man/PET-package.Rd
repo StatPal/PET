@@ -8,7 +8,7 @@ offer the possibility to simulate PET data.}
 \details{
 \tabular{ll}{
 Package: \tab PET\cr
-Version: \tab 0.4.7\cr
+Version: \tab 0.4.8\cr
 Date: \tab 2009-10-25\cr
 License: \tab GPL (>=2)\cr
 Copyright: \tab 2006-2009 Joern Schulz and Peter Toft \cr

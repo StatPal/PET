@@ -1,7 +1,7 @@
 \name{readData}
 \alias{readData}
 %- Also NEED an '\alias' for EACH other topic documented here.
-\title{Reload Saved Datasets in differnt Formats.}
+\title{Reload Saved Datasets in different Formats.}
 \description{
   The function offers the possibility to read a ".txt", ".dat", ".dat.gz", ".pet" or ".fif" file. Furthermore the graphics formats ".tif", ".tiff", ".pgm", ".ppm", ".png", ".pnm", ".gif", ".jpg" and ".jpeg" are supported.
 }
@@ -107,7 +107,7 @@ After this header the data are following.
 
 \examples{
 P <- phantom()
-writeData(P, "Phantom.pet")
+writeData(P, "Phantom.pet", fileOverwrite="YES" )
 P.new <- readData("Phantom.pet", DebugLevel = "Normal")
 viewData(P.new$Signal)
 rm(P, P.new)
