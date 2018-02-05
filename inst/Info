@@ -20,3 +20,17 @@ Modifications in Version: 0.4.9
 - (22.08.2010) 'readData.Rd': Modification in the example.
 - (22.08.2010) 'writeData.r': Implementation of the parameter fileOverwrite.
 - (22.08.2010) 'writeData.rd': Just update because modification, see before.
+
+Modifications in Version: 0.5.0
+
+- (03.02.2018) 'calc.c' : abs to fabs
+- (03.02.2018) 'art.c'  : Using R-function for generation of random numbers
+- (03.02.2018) 'misc.c' : Removing stdout
+- (03.02.2018) 'phantom.r' : Some correction in the definition of the phantom
+- (03.02.2018) 'viewData.r' : Replacing obsolete X11/windows
+- (03.02.2018) 'readData.r' : Removing require-statement
+- (03.02.2018) 'writeData.r' : Removing require-statement
+- (03.02.2018) 'NAMESPACE' : Adding depedencies
+- (03.02.2018) 'COPYRIGHT' : Moving COPYRIGHT statement in the folder ./inst
+- (03.02.2018) 'PET_ini.c' : File with generate content from tools::package_native_routine_registration_skeleton(".")
+

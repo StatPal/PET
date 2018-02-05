@@ -77,7 +77,7 @@ readData <- function(inputfile, DebugLevel="Normal")
                             "jpg", "jpeg")){
    ####################################################################
    #     different graphic-formats supported by the adimpro library
-    require(adimpro)
+    #require(adimpro)
     fdata <- read.image(inputfile, compress=FALSE)$img
     #require(edges)
     #fdata <- read.image(inputfile)

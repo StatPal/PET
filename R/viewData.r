@@ -121,17 +121,12 @@ viewData <- function(Data, Title=NULL, curWindow=TRUE, colors = gray((0:255)/255
     dev.set(curWindow)
    
   if (curWindow == FALSE) {
-    if (.Platform$OS.type == "unix")
-      X11(width=width, height=height)
-    else if(.Platform$OS.type == "windows")
-      windows(width=width, height=height)
-    else 
-      stop("The programm isn't supported on platform-type: '", .Platform$OS.type,"'.")
+    dev.new(width=width, height=height)
   }
 
- # las = Axenbeschriftung horizontal, oma = außerer Rand, mar = innerer Rand
+ # las = Axenbeschriftung horizontal, oma = aeusserer Rand, mar = innerer Rand
   par(mfrow=mfrow, las=1, oma = c(2,2,2,2)+0.1, mar=c(1,1,3,0.25), mgp=c(3,1,0))
-  par(adj=0.5) # Ausrichtung des Text in der Grafik linkbündig=0, mitte=0.5, r=1
+  par(adj=0.5) # Ausrichtung des Text in der Grafik linkbuendig=0, mitte=0.5, r=1
   par(plt=c(0.1,0.9,0.1,0.9)) # bereich setzen wo grafik gestzt werden soll
 
 

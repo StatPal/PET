@@ -99,6 +99,7 @@ Returns the current time in {\tt str} formatted as ``12:34:56''.
 [REVISION]
 Oct. 94, JJJ
 Mar 02/07 J.Schulz Memory allocation by R (Calloc)
+Feb 2018  J.Schulz Replace sprintf by Rprintf
 *******************************************************************************/
 void GetDateTime(char *str, int DateTimeFormat)
 {
@@ -117,6 +118,7 @@ void GetDateTime(char *str, int DateTimeFormat)
     strftime(str, 20,"%H.%M:%S", times);
   if (DateTimeFormat==_RealTime)
     sprintf(str,"%d",times->tm_sec+times->tm_min*60+times->tm_hour*3600);
+    //Rprintf(str, times->tm_sec+times->tm_min*60+times->tm_hour*3600, " \n") 
   Free_PT(timep);
 }
 
@@ -161,7 +163,7 @@ void Print(int Niveau, char *fmt, ...)
      || ((DebugNiveau&(_DNormal)) && (Niveau&(_DNormal)))) {
     Rvprintf(fmt,ap);
     //vprintf(fmt,ap);
-    fflush(stdout);
+    //fflush(stdout);
   }
   va_end(ap);
 } 

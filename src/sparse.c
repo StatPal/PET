@@ -923,7 +923,7 @@ Vector *SubtractVector(Vector* vec1,Vector* vec2)
   int m;
   Vector *tempV;
   
-  if ((vec1->N)!=(vec1->N))
+  if ((vec1->N)!=(vec2->N))
     Error("The two vectors do not match in length (SubtractVector %i %i)",
           vec1->N,
           vec2->N);

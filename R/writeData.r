@@ -195,8 +195,8 @@ writeData <- function(data, outputfile, fileHeader=NULL, imType="normal",
                               "jpg", "jpeg")){
    ####################################################################
    #     different graphic-formats supported by the adimpro library
-    require(adimpro)
-    data <- make.image(scaleImage(data, mode="max"), gamma=TRUE, compress=FALSE)
+    #require(adimpro)
+    data <- make.image(scaleImage(data, mode="max"), compress=FALSE)
     write.image(data, file=outputfile)
     #require(edges)
     #write.image(img=data, file=outputfile, depth=16)

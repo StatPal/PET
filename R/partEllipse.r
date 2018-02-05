@@ -37,7 +37,7 @@ partEllipse <- function(mod="hcirc1", x=0, y=0, intensity=0.1, n=257, re1=0.2,  
  if(DL1) cat("Start of function halfCircle. \n")
  data <- matrix(0,n,n)
  Ax <- matrix(seq(-1,1,length.out=n), nrow=n, ncol=n, byrow=TRUE)
- # Matrix Ax 90° gedreht
+ # Matrix Ax 90Grad gedreht
  rot90Ax <- matrix(seq(1,-1,length.out=n), nrow=n, ncol=n, byrow=FALSE)
  Axnew <- Ax-x
  Aynew <- rot90Ax - y

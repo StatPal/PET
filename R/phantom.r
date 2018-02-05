@@ -154,8 +154,8 @@ phantom <- function(n=257, design="A", addIm="none", DebugLevel="Normal")
       #
       #                  A    x0      y0     a       b      alpha
       #                 ------------------------------------------
-        par <- matrix(c(  1,   0 ,    0   , .69  , .92, ,      0,   
-                        -.8,   0 ,  -.0184, .6624, .8740,      0,),
+        par <- matrix(c(  1,   0 ,    0   , .69  , .92  ,      0,   
+                        -.8,   0 ,  -.0184, .6624, .8740,      0 ),
                       nrow=10 , ncol=6 , byrow=TRUE)
     }
     else stop("The default design ", design, " is not defined")
@@ -201,7 +201,7 @@ phantom <- function(n=257, design="A", addIm="none", DebugLevel="Normal")
   if(DL1) cat("Creation of the source-data --> ")
   data <- matrix(0,n,n)
   Ax <- matrix(seq(-1,1,length.out=n), nrow=n, ncol=n, byrow=TRUE)
- # Matrix Ax 90° gedreht
+ # Matrix Ax 90Grad gedreht
   rot90Ax <- matrix(seq(1,-1,length.out=n), nrow=n, ncol=n, byrow=FALSE)
 
   for (i in 1:nd1){

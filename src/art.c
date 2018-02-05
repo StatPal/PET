@@ -9,6 +9,7 @@ July 06, J.Schulz
 *****************************************************************/
 
 #include "it.h"
+#include<Rmath.h>
 
 /****************************************************************************
 [NAME]
@@ -32,6 +33,8 @@ Do not use, used internally.
 Jan. 95, JJJ and PT
 March 2007, J.Schulz 
       tempV[tempI[n]]=tempSM[n]*weigth; modified to tempV[tempI[n]]+=tempSM[n]*weigth;  
+February 2019, J.Schulz
+      random number generation by R instead of rand()
 ****************************************************************************/
 void ARTUpdateAddVector(Vector *MyV, SparseMatrix *MySm, float weigth, int rownr)
 {
@@ -147,7 +150,7 @@ Image *FAST_ART(SparseMatrix *AMatrix, Vector *xvector, Vector *bvector)
 
   tempXv=xvector->value;
   tempBv=bvector->value;
-  srand((int)clock());
+  //srand((int)clock());
   lambda=itINI.Alpha/itINI.Beta;
 
   TotalIterations=itINI.Iterations*ARows;
@@ -161,8 +164,13 @@ Image *FAST_ART(SparseMatrix *AMatrix, Vector *xvector, Vector *bvector)
 	    (currentiteration+1)*100.0/TotalIterations); 
     if (itINI.IterationType==1)
       currentrow=currentiteration%ARows;
-    else 
-      currentrow=(int)(ARows*(float)rand()/(RAND_MAX+1.0));
+    else {
+      //currentrow=(int)(ARows*(float)rand()/(RAND_MAX+1.0));
+      GetRNGstate();
+      currentrow = (int)(ARows*runif(0, 1));
+      //currentrow = (int)(ARows*runif(0, RAND_MAX)/(RAND_MAX+1.0));
+      PutRNGstate();
+    }
     if (AMatrix->Nm[currentrow]>0) {
       brk=lambda*(tempBv[currentrow]-
 		  MultSparseMatrixRowVector(AMatrix,xvector,currentrow))/
@@ -254,7 +262,7 @@ Image *SLOW_ART(Vector *xvector, Vector *bvector)
 
   tempXv=xvector->value;
   tempBv=bvector->value;
-  srand((int)clock());
+  //srand((int)clock());
   lambda=itINI.Alpha/itINI.Beta;
 
   TotalIterations=itINI.Iterations*ARows;
@@ -270,8 +278,13 @@ Image *SLOW_ART(Vector *xvector, Vector *bvector)
 	    (currentiteration+1)*100.0/TotalIterations); 
     if (itINI.IterationType==1)
       currentrow=currentiteration%ARows; 
-    else
-      currentrow=(int)(ARows*(float)rand()/(RAND_MAX+1.0));
+    else {
+      //currentrow=(int)(ARows*(float)rand()/(RAND_MAX+1.0));
+      GetRNGstate();
+      currentrow = (int)(ARows*runif(0, 1));
+      //currentrow = (int)(ARows*runif(0, RAND_MAX)/(RAND_MAX+1.0));
+      PutRNGstate();
+    }
 
     AVector=GenerateAMatrixRow(currentrow); 
     denom=MultVectorVector(AVector,AVector);

@@ -1,2 +1,27 @@
 useDynLib(PET)
-export(cutMatrix, hough, iniPetFifList, iradon, iradonIT, markPoisson, norm, partEllipse, phantom, radon, readData, readSifData, rotate, scaleImage, viewData, writeData)
+
+export(
+cutMatrix, 
+hough, 
+iniPetFifList, 
+iradon, 
+iradonIT, 
+markPoisson, 
+norm, 
+partEllipse, 
+phantom, 
+radon, 
+readData, 
+readSifData, 
+rotate, 
+scaleImage, 
+viewData, 
+writeData
+)
+
+import(adimpro)
+
+importFrom("grDevices", "dev.new", "dev.cur", "dev.set", "gray")
+importFrom("graphics", "image", "par", "title")
+importFrom("stats", "quantile", "runif")
+importFrom("utils", "flush.console", "read.table", "write.table")
