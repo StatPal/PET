@@ -1,4 +1,4 @@
-bf0a113ee116bec42d7d190cd3bdaad9 *DESCRIPTION
+46ba41305cf27242d32eaf1e1da216cb *DESCRIPTION
 7e0ddcefd13f01565c07a79c81fc1eb1 *NAMESPACE
 e2f8941f85cbec667c0604cdf6023a56 *R/cutMatrix.r
 e5ffcd2488421ac8d3001b52b769c5fb *R/eval.r
@@ -25,7 +25,7 @@ dc15c5a9c505f1bf410c5071089a5ce4 *demo/pet_ex1.r
 897517cb74944a1877d2b8b59b0cb24e *demo/pet_ex2.r
 b792632f22d83ac8c4fd3ce88c07536b *demo/pet_ex3.r
 b30c090333f031dab869789eaa14393f *demo/pet_ex4.r
-869a8e8890b84f204cbea2f71a5452bb *inst/COPYRIGHT
+e2bb9fbde03cff48745cb76230f11369 *inst/COPYRIGHT
 78a3ebd712a2e8e4164da2afcea2a7c3 *inst/Info
 e7752d9002805dbbafe4103549c3797a *man/PET-package.Rd
 ce029d25a04d180a03f4bba9410d9ead *man/cutMatrix.Rd
@@ -46,7 +46,7 @@ f919e85b19d579d87ed60b0be0f2c2a9 *man/viewData.Rd
 bcf41d493ecf72c68c9e8093d7feabdb *man/writeData.Rd
 5aa261ef7e443b79b80e6d42bafbe576 *src/Hough.c
 8ff5ca74db15a599eee7da500496ad56 *src/PET_init.c
-33faf1e55e50ec58dd820008630f3454 *src/amatrix.c
+deab00255c6bc5dc6f751ff014adb69c *src/amatrix.c
 d8b8aa5b6be4066a635d99ae7213d443 *src/analyze.h
 2803626b8a0b97e6b6eb58bdb11b1375 *src/art.c
 d20c6b529cf8d0f5efeefe6402d47ca2 *src/calc.c

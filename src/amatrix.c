@@ -304,7 +304,8 @@ void RegulateL1Matrix(SparseMatrix *AMatrix)
       tempVi=vec->index;
       tempVv=vec->value;
       tempVi[0]=y*XSamples+x;
-      memcpy(vec->value,&Reg,sizeof(float*));       
+      /* memcpy(vec->value,&Reg,sizeof(float*)); OLD. Resulting in warning */
+      memcpy(vec->value,&Reg,sizeof(float));
       InsertSparseVector(RMatrix,vec,x+y*XSamples);      
     }
   }
