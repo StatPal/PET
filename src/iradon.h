@@ -10,10 +10,10 @@
 #include "eval.h"
 #include "misc.h"
 
-int DebugNiveau=_DNormal;
-FILE *LogFile;
-char LogFileName[100];
-float multtemp;
-INI IniFile;
+// int DebugNiveau=_DNormal;
+// FILE *LogFile;
+// char LogFileName[100];
+// float multtemp;
+// INI IniFile;
 
 
