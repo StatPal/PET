@@ -352,7 +352,7 @@ Image *BackFilter(Image *MyImage)
   Ymin=IniFile.Ymin+((int)((OldWidth-YSamples-1)/2))*IniFile.DeltaY;
 
   /* Allocate new image, and put transformation parameters in it*/
-  InvMyImage=NewFloatImage("RecImage",XSamples,YSamples,_RealArray);  
+  InvMyImage=NewFloatImage("RecImage",XSamples,YSamples,_RealArray);  // Change
   InvMyImage->Xmin=Xmin;
   InvMyImage->Ymin=Ymin;
   InvMyImage->DeltaX=IniFile.DeltaX;
@@ -361,7 +361,12 @@ Image *BackFilter(Image *MyImage)
   
   /* Filter the backprojected image */
 
-  FFTImage(InvMyImage,_FFT); 
+  // (K'K)^{-1} = VDV'
+  // (K'K)^{-1} lam = V(D(V' lam))
+
+  // z1 = rearrange(??)(D)^{1/2} Refft_version(V' lam)
+
+  FFTImage(InvMyImage,_FFT);  // InvMyImage -> V' InvMyImage  
   CenterM=InvMyImage->M/2;
   CenterN=InvMyImage->N/2;
 
@@ -398,7 +403,7 @@ Image *BackFilter(Image *MyImage)
   FFTImage(InvMyImage,_IFFT);
   ShrinkImage(InvMyImage,OldHeight,OldWidth,_MiddleMiddle); 
   RealImage(InvMyImage);
-  //NormImage(InvMyImage,1.0,-MeanValue(InvMyImage));
+  //NormImage(InvMyImage,1.0,-MeanValue(InvMyImage));  // Change
   //PrintStats(_DDetail,InvMyImage);
   Free(Resx);
   Free(Resy);

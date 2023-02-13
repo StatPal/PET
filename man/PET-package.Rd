@@ -20,6 +20,7 @@ cutMatrix               Cut matrix.
 hough                   Hough transformation.
 iniPetFifList           Initializes a header for PET or FIF file.
 iradonIT                Iterative inverse radon transformation.
+iradon_smoothed         Smoothed inverse radon transformation.
 iradon                  Direct Inverse radon transformation.
 markPoisson             Marked poisson process.
 norm                    L1 and L2 norm.
