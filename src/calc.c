@@ -337,12 +337,12 @@ Image *BackFilter(Image *MyImage)
   float Xmin,Ymin,Res,*Resx,*Resy,TempFloat,*TempPoint;
   Image *InvMyImage;  
 
-  Print(_DNormal,"Filter after Backproject transforming: '%s'\n",MyImage->FileName);
-  Print(_DDetail,"Sinogram dimensions: M:%i N:%i\n",MyImage->M,MyImage->N);
-  Print(_DNormal,"Filtering ...\n");
+  // Print(_DNormal,"Filter after Backproject transforming: '%s'\n",MyImage->FileName);
+  // Print(_DNormal,"Sinogram dimensions: M:%i N:%i\n",MyImage->M,MyImage->N);
+  // Print(_DNormal,"Filtering ...\n");
 
   M=N=(int)((MyImage->N-1)/(float)sqrt(2))+1;
-  Print(_DDetail,"Backprojected image dim.: M:%i N:%i\n",IniFile.XSamples,IniFile.YSamples);
+  // Print(_DNormal,"Backprojected image dim.: M:%i N:%i\n",IniFile.XSamples,IniFile.YSamples);
   
   OldHeight=IniFile.XSamples;
   OldWidth =IniFile.YSamples;
@@ -357,7 +357,11 @@ Image *BackFilter(Image *MyImage)
   InvMyImage->Ymin=Ymin;
   InvMyImage->DeltaX=IniFile.DeltaX;
   InvMyImage->DeltaY=IniFile.DeltaY;
+
+  // Print(_DNormal,"Original MyImage dimensions: M:%i N:%i\n",MyImage->M,MyImage->N);  // M:181 N:183
   BackProject(MyImage,InvMyImage);
+  // Print(_DNormal,"Original InvMyImage dimensions after Backproject: M:%i N:%i\n",InvMyImage->M,InvMyImage->N);  // 256 256
+
   
   /* Filter the backprojected image */
 
@@ -367,6 +371,8 @@ Image *BackFilter(Image *MyImage)
   // z1 = rearrange(??)(D)^{1/2} Refft_version(V' lam)
 
   FFTImage(InvMyImage,_FFT);  // InvMyImage -> V' InvMyImage  
+  // Print(_DNormal,"Original InvMyImage dimensions after FFT: M:%i N:%i\n",InvMyImage->M,InvMyImage->N);  // 256 256
+
   CenterM=InvMyImage->M/2;
   CenterN=InvMyImage->N/2;
 
@@ -389,6 +395,8 @@ Image *BackFilter(Image *MyImage)
     /*Print(_DDebug,"Resy %5.5f\n",Resy[n]);*/
   }
   
+  // Print(_DNormal,"Original InvMyImage dimensions before filter: M:%i N:%i\n",InvMyImage->M,InvMyImage->N);  // 256 256
+
   for(m=0;m<InvMyImage->M;m++) {
     TempFloat=Resx[m];
     TempPoint=InvMyImage->Signal[m];
@@ -401,8 +409,15 @@ Image *BackFilter(Image *MyImage)
   }
 
   FFTImage(InvMyImage,_IFFT);
+  // Print(_DNormal,"Original InvMyImage dimensions after iFFT: M:%i N:%i\n",InvMyImage->M,InvMyImage->N);  // 256 256
+
   ShrinkImage(InvMyImage,OldHeight,OldWidth,_MiddleMiddle); 
+  // Print(_DNormal,"Original InvMyImage dimensions after shrinkimage: M:%i N:%i\n",InvMyImage->M,InvMyImage->N);  // 128 128
+
+
   RealImage(InvMyImage);
+  // Print(_DNormal,"Original InvMyImage dimensions after RealImage: M:%i N:%i\n",InvMyImage->M,InvMyImage->N);
+
   //NormImage(InvMyImage,1.0,-MeanValue(InvMyImage));  // Change
   //PrintStats(_DDetail,InvMyImage);
   Free(Resx);
