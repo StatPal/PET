@@ -69,12 +69,21 @@ Backproj_R <- function(rData, XSamples, YSamples,
   if (mode=="CC" || mode=="CNC" || mode=="CBC" || mode=="CNF" || 
       mode=="CBF" || mode=="FB" || mode=="BF" ){
 
+
+       Xsample_modified <- 2^as.integer(log(XSamples)/log(2)+1)
+       Ysample_modified <- 2^as.integer(log(YSamples)/log(2)+1)
+
+
       rDataDim  <- dim(rData)
     
      # calling the C-routine "iradon" from iradon.c
       irData <-.C("BackProjection_C", 
                  as.double(rData), 
-                 irData=double(XSamples*YSamples), 
+                 dat=double(XSamples*YSamples), 
+                 backfilter=as.double(matrix(0, Xsample_modified, Ysample_modified)),
+                 eigen_out=as.double(matrix(0, Xsample_modified, Ysample_modified)), 
+                 Xsample_modified = as.integer(1),
+                 Ysample_modified = as.integer(1),
                  as.character(mode),
                  as.integer(InterPol), 
                  as.character(FilterTypC),
@@ -87,10 +96,20 @@ Backproj_R <- function(rData, XSamples, YSamples,
                  as.integer(rDataDim[2]), 
                  as.integer(XSamples), 
                  as.integer(YSamples),
-                 PACKAGE="PET")$irData
+                 PACKAGE="PET")
+
+      irdat = irData$dat
+      backfilter = irData$backfilter
+      eigenvals = irData$eigen_out
+      Xsample_modified = irData$Xsample_modified
+      Ysample_modified = irData$Ysample_modified
+
     
-      irData <- scaleImage(matrix(irData,nrow=XSamples,ncol=YSamples, byrow=TRUE))
-      z <- list(irData=irData, 
+      irdat <- scaleImage(matrix(irdat,nrow=XSamples,ncol=YSamples, byrow=TRUE))
+      print(c(Xsample_modified, Ysample_modified))
+      z <- list(irData=irdat,
+            backfilter=matrix(backfilter, Xsample_modified, Ysample_modified, byrow=T),
+            filter=matrix(eigenvals, Xsample_modified, Ysample_modified, byrow=T),
             Header=list(SignalDim=c(XSamples,YSamples), 
                         XYmin=c(Xmin, Ymin), 
                         DeltaXY=c(DeltaX,DeltaY)), 
