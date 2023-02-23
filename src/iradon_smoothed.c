@@ -45,15 +45,14 @@ So, basically it only backprojects, i.e., f -> K'f
 */
 Image *BackProjection(Image *MyImage)
 {
-  int i,m,n,mm,nn,M,N,OldHeight,OldWidth;
-  int XSamples,YSamples,CenterM,CenterN;
-  float Xmin,Ymin,Res,*Resx,*Resy,TempFloat,*TempPoint;
+  int OldHeight,OldWidth,XSamples,YSamples;
+  float Xmin,Ymin;
   Image *InvMyImage;
 
   // Print(_DNormal,"Backproject transforming: '%s'\n",MyImage->FileName);
   Print(_DNormal,"\nMyImage dimensions in Backprojection 1: M:%i N:%i\n",MyImage->M,MyImage->N);
 
-  M=N=(int)((MyImage->N-1)/(float)sqrt(2))+1;
+  //M=N=(int)((MyImage->N-1)/(float)sqrt(2))+1;
 
   Print(_DNormal,"Backprojected image dim.: M:%i N:%i\n",IniFile.XSamples,IniFile.YSamples);
   
@@ -85,9 +84,9 @@ Image *BackProjection(Image *MyImage)
 ***************************************************************************/
 void filter_new(Image *MyImage, double **eig){
 
-  int i,m,n,mm,nn,M,N,OldHeight,OldWidth;
-  int XSamples,YSamples,CenterM,CenterN;
-  float Xmin,Ymin,Res,*Resx,*Resy,TempFloat,*TempPoint;
+  int i,m,n,mm,nn;
+  int CenterM,CenterN;
+  float *Resx,*Resy,TempFloat,*TempPoint;
 
   Image *InvMyImage;
   InvMyImage = BackProjection(MyImage);
@@ -125,7 +124,7 @@ void filter_new(Image *MyImage, double **eig){
 	FILE *ffile=fopen("eigens_inside_filter.dat","w");
   for(m=0;m<InvMyImage->M;m++) {
     TempFloat=Resx[m];
-    TempPoint=InvMyImage->Signal[m];
+    // TempPoint=InvMyImage->Signal[m];
     for(n=0,i=0;n<InvMyImage->N;n++) {
       // eig[m][i++]=sqrt(TempFloat+Resy[n]);
       eig[m][i]=sqrt(TempFloat+Resy[n]);
@@ -149,13 +148,66 @@ void iradon_smoothed_C(double *InImage, double *OutImage, char **mode, int *Inte
 }
 
 
+void only_BackProject_C(double *InImage, double *OutImage, char **mode, int *InterPol , char **FilterTyp, char **DebugLevel, double *Xmin, double *Ymin, double *DeltaX, double *DeltaY, int *M, int *N, int *XSamples, int *YSamples)
+{
+  // Image *NewImage, *InvNewImage, *spectrum, *RefImage;
+  // ReadIradonArgs("RadonData",*mode, *DebugLevel, InterPol, *FilterTyp, Xmin, Ymin, DeltaX, DeltaY, XSamples, YSamples); 
 
+  // // initialization of radon-image
+  // NewImage=NewFloatImage(IniFile.InFile, *M, *N,_RealArray);
+  // RDoubleToImage(NewImage, InImage, *M, *N );
+  // InitImage(NewImage);
+
+  // // Instead of Backfilter
+  // int i,m,n,mm,nn,M1,N1,OldHeight,OldWidth;
+  // int XSamples1,YSamples1,CenterM,CenterN;
+  // float Xmin1,Ymin1,Res,*Resx,*Resy,TempFloat,*TempPoint;
+  // Image *InvMyImage;
+
+  // // Print(_DNormal,"Sinogram dimensions: M:%i N:%i\n",NewImage->M,NewImage->N);  // 320x135
+
+  // M1=N1=(int)((NewImage->N-1)/(float)sqrt(2))+1;
+  // // Print(_DNormal,"Backprojected image dim.: M:%i N:%i\n",IniFile.XSamples,IniFile.YSamples); //61x105
+  
+  // OldHeight=IniFile.XSamples;
+  // OldWidth =IniFile.YSamples;
+  // XSamples1=1<<(int)(log(IniFile.XSamples)/log(2)+1);
+  // YSamples1=1<<(int)(log(IniFile.YSamples)/log(2)+1);
+  // Xmin1=IniFile.Xmin+((int)((OldHeight-XSamples1-1)/2))*IniFile.DeltaX;
+  // Ymin1=IniFile.Ymin+((int)((OldWidth-YSamples1-1)/2))*IniFile.DeltaY;
+
+
+  // /* Allocate new image, and put transformation parameters in it*/
+  // InvMyImage=NewFloatImage("RecImage",XSamples1,YSamples1,_RealArray);  // Change
+  // InvMyImage->Xmin=Xmin1;
+  // InvMyImage->Ymin=Ymin1;
+  // InvMyImage->DeltaX=IniFile.DeltaX;
+  // InvMyImage->DeltaY=IniFile.DeltaY;
+
+
+
+  // Image *NewImagecpy;
+  // NewImagecpy = CopyImage(NewImage);  // NewImagecpy = NewImage;  // Both changes
+  
+  // Print(_DNormal,"\nOriginal NewImage dimensions: M:%i N:%i\n",NewImage->M,NewImage->N);  // 320x135
+  // BackProject(NewImage,InvMyImage);
+  // Print(_DNormal,"Original NewImage dimensions: M:%i N:%i\n",NewImage->M,NewImage->N);  // 320x157
+
+
+
+  // ScaleImage(InvMyImage);
+  // PrintStats(_DDetail,InvMyImage);
+  // ImageToFloat(OutImage, InvMyImage);
+  // FreeImage(InvMyImage);
+  
+  // FreeImage(NewImage);
+}
 
 
 
 void BackProjection_C(double *InImage, double *OutImage, char **mode, int *InterPol , char **FilterTyp, char **DebugLevel, double *Xmin, double *Ymin, double *DeltaX, double *DeltaY, int *M, int *N, int *XSamples, int *YSamples)
 {
-  Image *NewImage, *InvNewImage, *spectrum, *RefImage;
+  Image *NewImage;
   
   if (strstr(*DebugLevel,"HardCore")) DebugNiveau=_DHardCore;
   else DebugNiveau=_DNormal;
@@ -174,14 +226,14 @@ void BackProjection_C(double *InImage, double *OutImage, char **mode, int *Inter
 
 
   // Instead of Backfilter
-  int i,m,n,mm,nn,M1,N1,OldHeight,OldWidth;
+  int i,m,n,mm,nn,OldHeight,OldWidth;
   int XSamples1,YSamples1,CenterM,CenterN;
   float Xmin1,Ymin1,Res,*Resx,*Resy,TempFloat,*TempPoint;
   Image *InvMyImage;
 
   // Print(_DNormal,"Sinogram dimensions: M:%i N:%i\n",NewImage->M,NewImage->N);  // 320x135
 
-  M1=N1=(int)((NewImage->N-1)/(float)sqrt(2))+1;
+  // M1=N1=(int)((NewImage->N-1)/(float)sqrt(2))+1;
   // Print(_DNormal,"Backprojected image dim.: M:%i N:%i\n",IniFile.XSamples,IniFile.YSamples); //61x105
   
   OldHeight=IniFile.XSamples;
@@ -279,6 +331,7 @@ void BackProjection_C(double *InImage, double *OutImage, char **mode, int *Inter
   FreeImage(InvMyImage);
   
   FreeImage(NewImage);
+  FreeImage(NewImagecpy);
 }
 
 
@@ -291,7 +344,7 @@ void BackProjection_C(double *InImage, double *OutImage, char **mode, int *Inter
 // Test 
 void BackProjection_C_test(double *InImage, double *OutImage, char **mode, int *InterPol , char **FilterTyp, char **DebugLevel, double *Xmin, double *Ymin, double *DeltaX, double *DeltaY, int *M, int *N, int *XSamples, int *YSamples)
 {
-  Image *NewImage, *InvNewImage, *spectrum, *RefImage;
+  Image *NewImage;
   
   if (strstr(*DebugLevel,"HardCore")) DebugNiveau=_DHardCore;
   else DebugNiveau=_DNormal;
@@ -310,7 +363,7 @@ void BackProjection_C_test(double *InImage, double *OutImage, char **mode, int *
 
 
   // Instead of Backfilter
-  int i,m,n,mm,nn,M1,N1,OldHeight,OldWidth;
+  int i,m,n,mm,nn,OldHeight,OldWidth;
   int XSamples1,YSamples1,CenterM,CenterN;
   float Xmin1,Ymin1,Res,*Resx,*Resy,TempFloat,*TempPoint;
   Image *InvMyImage;
@@ -318,7 +371,7 @@ void BackProjection_C_test(double *InImage, double *OutImage, char **mode, int *
   // Print(_DNormal,"Filter after Backproject transforming: '%s'\n",NewImage->FileName);
   Print(_DNormal,"Sinogram dimensions: M:%i N:%i\n",NewImage->M,NewImage->N);  // 320x135
 
-  M1=N1=(int)((NewImage->N-1)/(float)sqrt(2))+1;
+  // M1=N1=(int)((NewImage->N-1)/(float)sqrt(2))+1;
   Print(_DNormal,"Backprojected image dim.: M:%i N:%i\n",IniFile.XSamples,IniFile.YSamples); //61x105
   
   OldHeight=IniFile.XSamples;
