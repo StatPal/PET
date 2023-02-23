@@ -49,6 +49,8 @@ Feb. 95, JJJ, fixed minor bug.
 ******************************************************************************/
 void BackProject(Image *Sinogram, Image *InvMyImage)
 {
+  // Print(_DNormal," * Sinogram dimensions in Backproject 1\n: M:%i N:%i\n", Sinogram->M,Sinogram->N);
+
   int m,n,N,t,XSamples,YSamples,RhoInt;
   Image *XCosTable, *YSinTable;
   float Xmin,Ymin,DeltaX,DeltaY,Rho,DeltaRho,RhoMax,TempSin,TempCos,sum;

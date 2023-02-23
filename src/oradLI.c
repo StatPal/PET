@@ -48,19 +48,21 @@ void radonLI(double *v,double *u,double *setpar)
   theta_min    = setpar[8];
 
   idx=1.0/Delta_x;
-  for(t=0; t<T;t++)
+  for(t=0; t<T;t++)   // T=ma?
   {
     theta=t*Delta_theta+theta_min;
     sintheta=sin(theta);
     costheta=cos(theta);
-    rhooffset=x_min*(costheta+sintheta);
-    if (sintheta>sqrt(0.5))
+    rhooffset=x_min*(costheta+sintheta);  // Common factor
+    if (sintheta>sqrt(0.5))               // Project onto x axis
     {
       dx_isintheta=Delta_x/sintheta;
-      alpha=-costheta/sintheta;
-      for(r=0; r<R; r++ ) 
+      alpha=-costheta/sintheta;           // Digital slope is set
+      for(r=0; r<R; r++ )                 // For all values of rho
       {
-        beta=(r*Delta_rho+rho_min-rhooffset)/(Delta_x*sintheta);
+        beta=(r*Delta_rho+rho_min-rhooffset)/(Delta_x*sintheta);    // Offset is set
+
+        // mmin and mmax are set using eqn 1.19
         if (alpha>eps)
         {
           mmin=(int)ceil((eps-beta)/alpha);
@@ -85,26 +87,28 @@ void radonLI(double *v,double *u,double *setpar)
             }
         if (mmin<0) mmin=0;
         if (mmax>M) mmax=M;
+        // mmin and mmax set
+
 
         sum=0.0;
-        for (m=mmin;m<mmax;m++)
+        for (m=mmin;m<mmax;m++)   // For all legal values of x
         {
           nfloat=beta+m*alpha;
           n=(int)nfloat;
           reldx=(nfloat-n)*idx;
           adr=m+M*n;
-          sum+=u[adr]*(1-reldx)+u[adr+M]*reldx;
+          sum+=u[adr]*(1-reldx)+u[adr+M]*reldx;  // Increment sum
         }
-        v[t+T*r]=sum*dx_isintheta;
+        v[t+T*r]=sum*dx_isintheta;                // Update matrix element
       }
     }
-    else
+    else                                          // Project onto y-axis
     {
-      dx_icostheta=Delta_x/fabs(costheta);
-      alpha=-sintheta/costheta;
+      dx_icostheta=Delta_x/fabs(costheta);        // DIFFERENT
+      alpha=-sintheta/costheta;                   // DIFFERENT
       for(r=0; r<R; r++ ) 
       {
-        beta=(r*Delta_rho+rho_min-rhooffset)/(Delta_x*costheta);
+        beta=(r*Delta_rho+rho_min-rhooffset)/(Delta_x*costheta);    // DIFFERENT
         if (alpha>eps)
         {
           nmin=(int)ceil((eps-beta)/alpha);
@@ -139,7 +143,7 @@ void radonLI(double *v,double *u,double *setpar)
           adr=m+M*n;
           sum+=u[adr]*(1-reldx)+u[adr+1]*reldx;
         }
-        v[t+T*r]=sum*dx_icostheta;
+        v[t+T*r]=sum*dx_icostheta;                // DIFFERENT
       }
     }
   }
