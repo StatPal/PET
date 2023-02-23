@@ -519,7 +519,7 @@ void BackProjection_C_test(double *InImage, double *OutImage, char **mode, int *
 
   
   FreeImage(NewImage);
-  FreeImage(NewImagecpy)
+  FreeImage(NewImagecpy);
   Print(_DNormal,"return to R.          \n");
 
 }
