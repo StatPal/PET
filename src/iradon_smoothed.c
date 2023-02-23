@@ -240,13 +240,122 @@ void iradon_smoothed_C(double *InImage, double *OutImage, char **mode, int *Inte
 
 
 
+void BackProjection_C_shrinked(double *InImage, double *OutImage, double *backfilter, double *eig_out, int *Xdim_modified, int *Ydim_modified, 
+                      char **mode, int *InterPol , char **FilterTyp, char **DebugLevel, double *Xmin, double *Ymin, double *DeltaX, double *DeltaY, int *M, int *N, int *XSamples, int *YSamples)
+{
+  Image *NewImage;
+  ReadIradonArgs("RadonData",*mode, *DebugLevel, InterPol, *FilterTyp, Xmin, Ymin, DeltaX, DeltaY, XSamples, YSamples); 
+
+  // initialization of radon-image
+  NewImage=NewFloatImage(IniFile.InFile, *M, *N,_RealArray);
+  RDoubleToImage(NewImage, InImage, *M, *N );
+  InitImage(NewImage);
+  
+  // Instead of Backfilter
+  int i,m,n,OldHeight,OldWidth,XSamples1,YSamples1;
+  float Xmin1,Ymin1;
+  Image *InvMyImage, *NewImagecpy;
+
+  // Print(_DNormal,"Sinogram dimensions: M:%i N:%i\n",NewImage->M,NewImage->N);  // 320x135
+  // Print(_DNormal,"Backprojected image dim.: M:%i N:%i\n",IniFile.XSamples,IniFile.YSamples); //61x105
+  
+  OldHeight=IniFile.XSamples;
+  OldWidth =IniFile.YSamples;
+  XSamples1=1<<(int)(log(IniFile.XSamples)/log(2)+1);
+  YSamples1=1<<(int)(log(IniFile.YSamples)/log(2)+1);
+  Xmin1=IniFile.Xmin+((int)((OldHeight-XSamples1-1)/2))*IniFile.DeltaX;
+  Ymin1=IniFile.Ymin+((int)((OldWidth-YSamples1-1)/2))*IniFile.DeltaY;
+
+  *Xdim_modified = XSamples1;
+  *Ydim_modified = YSamples1;
+
+  /* Allocate new image, and put transformation parameters in it*/
+  InvMyImage=NewFloatImage("RecImage",XSamples1,YSamples1,_RealArray);  // Change
+  InvMyImage->Xmin=Xmin1;
+  InvMyImage->Ymin=Ymin1;
+  InvMyImage->DeltaX=IniFile.DeltaX;
+  InvMyImage->DeltaY=IniFile.DeltaY;
+
+
+  NewImagecpy = CopyImage(NewImage);  // NewImagecpy = NewImage;  // Both changes  
+  Print(_DNormal,"\nOriginal NewImage dimensions: M:%i N:%i\n",NewImage->M,NewImage->N);  // 320x135
+  BackProject(NewImage,InvMyImage);
+  Print(_DNormal,"Original NewImage dimensions: M:%i N:%i\n",NewImage->M,NewImage->N);  // 320x157
+  
+  ShrinkImage(InvMyImage,OldHeight,OldWidth,_MiddleMiddle);
+  ImageToFloat(backfilter, InvMyImage);  // NEW output to R
+  // Do it by hand
+
+
+
+
+  double **eig;
+  int eigen_M = InvMyImage->M, eigen_N = InvMyImage->N;
+  MAKE_2ARRAY(eig, (size_t)eigen_M, (size_t)eigen_N);
+  printf("eig dim %d, %d\n", eigen_M, eigen_N);  // 64x128
+  // printf("\nCase 1 NewImagecpy-> M %d, NewImagecpy-> N %d\n", NewImagecpy->M, NewImagecpy->N);  // 320x135
+  filter_new(NewImagecpy, eig);
+  // printf("\nCase 2 NewImagecpy-> M %d, NewImagecpy-> N %d\n", NewImagecpy->M, NewImagecpy->N);  // 320x157
+ 
+  
+  /* Filter the backprojected image */
+  FFTImage(InvMyImage,_FFT);
+
+  for(m=0;m<InvMyImage->M;m++) {
+    for(n=0,i=0;n<InvMyImage->N;n++) {
+      InvMyImage->Signal[m][i++]*=eig[m][n];
+      InvMyImage->Signal[m][i++]*=eig[m][n];
+      // A small difference is due to being double instead of float
+    }
+  }
+
+
+
+  // There is a multiple thing going on
+  double *eig_tmp;
+  MAKE_1ARRAY(eig_tmp, eigen_M*eigen_N);
+  vectorize(eigen_M, eigen_N, eig, eig_tmp);  // output to R
+
+  // To use Shrinkimage on eigen, we can turn it into a image first
+  Image *eigen_Image;
+  eigen_Image=NewFloatImage(IniFile.InFile, eigen_M, eigen_M, _RealArray);// initialization of radon-image
+  RDoubleToImage(eigen_Image, eig_tmp, eigen_M, eigen_N );
+  InitImage(eigen_Image);
+
+  ShrinkImage(eigen_Image, OldHeight, OldWidth, _MiddleMiddle);
+  ImageToFloat(eig_out, eigen_Image);  // NEW output to R
+  FREE_MATRIX(eig);
+  // NOT CHECKED - CHECK
+
+
+
+
+
+
+  FFTImage(InvMyImage,_IFFT);
+  // Print(_DNormal,"Original InvMyImage dimensions after iFFT: M:%i N:%i\n",InvMyImage->M,InvMyImage->N);  // 128x128
+  ShrinkImage(InvMyImage,OldHeight,OldWidth,_MiddleMiddle); 
+  Print(_DNormal,"Original InvMyImage dimensions after shrinkimage: M:%i N:%i\n",InvMyImage->M,InvMyImage->N);  // 65x105
+  RealImage(InvMyImage);
+
+
+  ScaleImage(InvMyImage);
+  PrintStats(_DDetail,InvMyImage);
+  ImageToFloat(OutImage, InvMyImage);
+  FreeImage(InvMyImage);
+  
+  FreeImage(NewImage);
+  FreeImage(NewImagecpy);
+
+  Print(_DNormal,"return to R.          \n");
+}
+
+
+
 void BackProjection_C(double *InImage, double *OutImage, double *backfilter, double *eig_out, int *Xdim_modified, int *Ydim_modified, 
                       char **mode, int *InterPol , char **FilterTyp, char **DebugLevel, double *Xmin, double *Ymin, double *DeltaX, double *DeltaY, int *M, int *N, int *XSamples, int *YSamples)
 {
   Image *NewImage;
-  
-  if (strstr(*DebugLevel,"HardCore")) DebugNiveau=_DHardCore;
-  else DebugNiveau=_DNormal;
   ReadIradonArgs("RadonData",*mode, *DebugLevel, InterPol, *FilterTyp, Xmin, Ymin, DeltaX, DeltaY, XSamples, YSamples); 
 
   // initialization of radon-image
@@ -333,6 +442,13 @@ void BackProjection_C(double *InImage, double *OutImage, double *backfilter, dou
 
   Print(_DNormal,"return to R.          \n");
 }
+
+
+
+
+
+
+
 
 
 
