@@ -81,6 +81,10 @@ Image *BackProjection(Image *MyImage)
 
 /***************************************************************************
  * Eigenvalues of K'K
+ * Okay, here 
+ * `InvMyImage->Signal[m];`
+ * is not used. 
+ * Basically the Signal should be multiplied by the eig.
 ***************************************************************************/
 void filter_new(Image *MyImage, double **eig){
 
@@ -126,6 +130,8 @@ void filter_new(Image *MyImage, double **eig){
   for(m=0;m<InvMyImage->M;m++) {
     TempFloat=Resx[m];
     // TempPoint=InvMyImage->Signal[m];
+
+    // I think n and i are same in this loop
     for(n=0,i=0;n<InvMyImage->N;n++) {
       // eig[m][i++]=sqrt(TempFloat+Resy[n]);
       eig[m][i]=sqrt(TempFloat+Resy[n]);
@@ -134,6 +140,10 @@ void filter_new(Image *MyImage, double **eig){
     }
   }
   fclose(ffile);
+
+  FreeImage(InvMyImage);
+  Free(Resx);
+  Free(Resy);
 
 }
 
@@ -257,6 +267,111 @@ void BackProjection_C(double *InImage, double *OutImage, char **mode, int *Inter
   Image *InvMyImage;
 
   // Print(_DNormal,"Sinogram dimensions: M:%i N:%i\n",NewImage->M,NewImage->N);  // 320x135
+  // Print(_DNormal,"Backprojected image dim.: M:%i N:%i\n",IniFile.XSamples,IniFile.YSamples); //61x105
+  
+  OldHeight=IniFile.XSamples;
+  OldWidth =IniFile.YSamples;
+  XSamples1=1<<(int)(log(IniFile.XSamples)/log(2)+1);
+  YSamples1=1<<(int)(log(IniFile.YSamples)/log(2)+1);
+  Xmin1=IniFile.Xmin+((int)((OldHeight-XSamples1-1)/2))*IniFile.DeltaX;
+  Ymin1=IniFile.Ymin+((int)((OldWidth-YSamples1-1)/2))*IniFile.DeltaY;
+
+
+  /* Allocate new image, and put transformation parameters in it*/
+  InvMyImage=NewFloatImage("RecImage",XSamples1,YSamples1,_RealArray);  // Change
+  InvMyImage->Xmin=Xmin1;
+  InvMyImage->Ymin=Ymin1;
+  InvMyImage->DeltaX=IniFile.DeltaX;
+  InvMyImage->DeltaY=IniFile.DeltaY;
+
+
+
+  Image *NewImagecpy;
+  NewImagecpy = CopyImage(NewImage);  // NewImagecpy = NewImage;  // Both changes
+  
+  Print(_DNormal,"\nOriginal NewImage dimensions: M:%i N:%i\n",NewImage->M,NewImage->N);  // 320x135
+  BackProject(NewImage,InvMyImage);
+  Print(_DNormal,"Original NewImage dimensions: M:%i N:%i\n",NewImage->M,NewImage->N);  // 320x157
+
+
+
+
+  double **eig;
+  int eigen_M = InvMyImage->M;
+  int eigen_N = InvMyImage->N;
+  MAKE_2ARRAY(eig, (size_t)eigen_M, (size_t)eigen_N);
+  printf("eig dim %d, %d\n", eigen_M, eigen_N);  // 64x128
+  printf("\nCase 1 NewImagecpy-> M %d, NewImagecpy-> N %d\n", NewImagecpy->M, NewImagecpy->N);  // 320x135
+  filter_new(NewImagecpy, eig);
+  printf("\nCase 2 NewImagecpy-> M %d, NewImagecpy-> N %d\n", NewImagecpy->M, NewImagecpy->N);  // 320x157
+ 
+  
+  /* Filter the backprojected image */
+  FFTImage(InvMyImage,_FFT);
+
+  for(m=0;m<InvMyImage->M;m++) {
+    for(n=0,i=0;n<InvMyImage->N;n++) {
+      InvMyImage->Signal[m][i++]*=eig[m][n];
+      InvMyImage->Signal[m][i++]*=eig[m][n];
+      // A small difference is due to being double instead of float
+    }
+  }
+  FREE_MATRIX(eig);
+
+
+  FFTImage(InvMyImage,_IFFT);
+  // Print(_DNormal,"Original InvMyImage dimensions after iFFT: M:%i N:%i\n",InvMyImage->M,InvMyImage->N);  // 128x128
+  ShrinkImage(InvMyImage,OldHeight,OldWidth,_MiddleMiddle); 
+  Print(_DNormal,"Original InvMyImage dimensions after shrinkimage: M:%i N:%i\n",InvMyImage->M,InvMyImage->N);  // 65x105
+  RealImage(InvMyImage);
+
+
+  ScaleImage(InvMyImage);
+  PrintStats(_DDetail,InvMyImage);
+  ImageToFloat(OutImage, InvMyImage);
+  FreeImage(InvMyImage);
+  
+  FreeImage(NewImage);
+  FreeImage(NewImagecpy);
+
+  Print(_DNormal,"return to R.          \n");
+}
+
+
+
+
+
+
+
+
+// Test 
+void BackProjection_C_test(double *InImage, double *OutImage, char **mode, int *InterPol , char **FilterTyp, char **DebugLevel, double *Xmin, double *Ymin, double *DeltaX, double *DeltaY, int *M, int *N, int *XSamples, int *YSamples)
+{
+  Image *NewImage;
+  
+  if (strstr(*DebugLevel,"HardCore")) DebugNiveau=_DHardCore;
+  else DebugNiveau=_DNormal;
+  ReadIradonArgs("RadonData",*mode, *DebugLevel, InterPol, *FilterTyp, Xmin, Ymin, DeltaX, DeltaY, XSamples, YSamples); 
+
+  // initialization of radon-image
+  NewImage=NewFloatImage(IniFile.InFile, *M, *N,_RealArray);
+  RDoubleToImage(NewImage, InImage, *M, *N );
+  InitImage(NewImage);
+  
+
+
+
+
+
+
+
+  // Instead of Backfilter
+  int i,m,n,mm,nn,OldHeight,OldWidth;
+  int XSamples1,YSamples1,CenterM,CenterN;
+  float Xmin1,Ymin1,Res,*Resx,*Resy,TempFloat,*TempPoint;
+  Image *InvMyImage;
+
+  // Print(_DNormal,"Sinogram dimensions: M:%i N:%i\n",NewImage->M,NewImage->N);  // 320x135
 
   // M1=N1=(int)((NewImage->N-1)/(float)sqrt(2))+1;
   // Print(_DNormal,"Backprojected image dim.: M:%i N:%i\n",IniFile.XSamples,IniFile.YSamples); //61x105
@@ -296,43 +411,59 @@ void BackProjection_C(double *InImage, double *OutImage, char **mode, int *Inter
   printf("\nCase 1 NewImagecpy-> M %d, NewImagecpy-> N %d\n", NewImagecpy->M, NewImagecpy->N);  // 320x135
   filter_new(NewImagecpy, eig);
   printf("\nCase 2 NewImagecpy-> M %d, NewImagecpy-> N %d\n", NewImagecpy->M, NewImagecpy->N);  // 320x157
-  FREE_MATRIX(eig);
+  // FREE_MATRIX(eig);
 
 
   
   /* Filter the backprojected image */
   FFTImage(InvMyImage,_FFT);
 
-  CenterM=InvMyImage->M/2;
-  CenterN=InvMyImage->N/2;
-  Resx=FloatVector(InvMyImage->M);
-  Resy=FloatVector(InvMyImage->N);
+  // CenterM=InvMyImage->M/2;
+  // CenterN=InvMyImage->N/2;
+  // Resx=FloatVector(InvMyImage->M);
+  // Resy=FloatVector(InvMyImage->N);
   
+  // for(m=0;m<InvMyImage->M;m++) {
+  //   mm=m;
+  //   if(mm>=CenterM) mm=InvMyImage->M-m;
+  //   Resx[m]=(((float)mm)/InvMyImage->M)*(((float)mm)/InvMyImage->M)/
+  //     (InvMyImage->DeltaX*InvMyImage->DeltaX);
+  // }
+  
+  // for(n=0;n<InvMyImage->N;n++) {
+  //   nn=n;
+  //   if(nn>=CenterN) nn=InvMyImage->N-n;
+  //   Resy[n]=(((float)nn)/InvMyImage->N)*(((float)nn)/InvMyImage->N)/
+  //     (InvMyImage->DeltaY*InvMyImage->DeltaY);
+  // }
+  
+  // Print(_DNormal,"InvMyImage dimensions before multiplying by Eigen: M:%i N:%i\n",InvMyImage->M,InvMyImage->N);  // 128x128
+  // for(m=0;m<InvMyImage->M;m++) {
+  //   TempFloat=Resx[m];
+  //   TempPoint=InvMyImage->Signal[m];
+  //   for(n=0,i=0;n<InvMyImage->N;n++) {
+  //     Res=sqrt(TempFloat+Resy[n]);
+  //     /*Print(_DDebug,"Res %5.5f\n",Res);*/
+  //     TempPoint[i++]*=Res;
+  //     TempPoint[i++]*=Res;
+
+
+  //     // if(fabs(eig[m][n] - Res) > 1e-7) printf("eig %f, Res %f \t", eig[m][n], Res);
+  //   }
+  // }
+
+
+  // The difference is due to being double instead of float
   for(m=0;m<InvMyImage->M;m++) {
-    mm=m;
-    if(mm>=CenterM) mm=InvMyImage->M-m;
-    Resx[m]=(((float)mm)/InvMyImage->M)*(((float)mm)/InvMyImage->M)/
-      (InvMyImage->DeltaX*InvMyImage->DeltaX);
-  }
-  
-  for(n=0;n<InvMyImage->N;n++) {
-    nn=n;
-    if(nn>=CenterN) nn=InvMyImage->N-n;
-    Resy[n]=(((float)nn)/InvMyImage->N)*(((float)nn)/InvMyImage->N)/
-      (InvMyImage->DeltaY*InvMyImage->DeltaY);
-  }
-  
-  Print(_DNormal,"InvMyImage dimensions before multiplying by Eigen: M:%i N:%i\n",InvMyImage->M,InvMyImage->N);  // 128x128
-  for(m=0;m<InvMyImage->M;m++) {
-    TempFloat=Resx[m];
-    TempPoint=InvMyImage->Signal[m];
+    // TempPoint=InvMyImage->Signal[m];
     for(n=0,i=0;n<InvMyImage->N;n++) {
-      Res=sqrt(TempFloat+Resy[n]);
-      /*Print(_DDebug,"Res %5.5f\n",Res);*/
-      TempPoint[i++]*=Res;
-      TempPoint[i++]*=Res;
+      InvMyImage->Signal[m][i++]*=eig[m][n];
+      InvMyImage->Signal[m][i++]*=eig[m][n];
     }
   }
+  FREE_MATRIX(eig);
+
+
 
   FFTImage(InvMyImage,_IFFT);
   // Print(_DNormal,"Original InvMyImage dimensions after iFFT: M:%i N:%i\n",InvMyImage->M,InvMyImage->N);  // 128x128
@@ -340,10 +471,10 @@ void BackProjection_C(double *InImage, double *OutImage, char **mode, int *Inter
   Print(_DNormal,"Original InvMyImage dimensions after shrinkimage: M:%i N:%i\n",InvMyImage->M,InvMyImage->N);  // 65x105
   RealImage(InvMyImage);
 
-  //NormImage(InvMyImage,1.0,-MeanValue(InvMyImage));  // Change
-  //PrintStats(_DDetail,InvMyImage);
-  Free(Resx);
-  Free(Resy);
+  // //NormImage(InvMyImage,1.0,-MeanValue(InvMyImage));  // Change
+  // //PrintStats(_DDetail,InvMyImage);
+  // Free(Resx);
+  // Free(Resy);
   
 
 
@@ -356,170 +487,7 @@ void BackProjection_C(double *InImage, double *OutImage, char **mode, int *Inter
   FreeImage(InvMyImage);
   
   FreeImage(NewImage);
-  FreeImage(NewImagecpy);
-}
-
-
-
-
-
-
-
-
-// Test 
-void BackProjection_C_test(double *InImage, double *OutImage, char **mode, int *InterPol , char **FilterTyp, char **DebugLevel, double *Xmin, double *Ymin, double *DeltaX, double *DeltaY, int *M, int *N, int *XSamples, int *YSamples)
-{
-  Image *NewImage;
-  
-  if (strstr(*DebugLevel,"HardCore")) DebugNiveau=_DHardCore;
-  else DebugNiveau=_DNormal;
-  ReadIradonArgs("RadonData",*mode, *DebugLevel, InterPol, *FilterTyp, Xmin, Ymin, DeltaX, DeltaY, XSamples, YSamples); 
-
-  // initialization of radon-image
-  NewImage=NewFloatImage(IniFile.InFile, *M, *N,_RealArray);
-  RDoubleToImage(NewImage, InImage, *M, *N );
-  InitImage(NewImage);
-  
-
-
-
-
-
-
-
-  // Instead of Backfilter
-  int i,m,n,mm,nn,OldHeight,OldWidth;
-  int XSamples1,YSamples1,CenterM,CenterN;
-  float Xmin1,Ymin1,Res,*Resx,*Resy,TempFloat,*TempPoint;
-  Image *InvMyImage;
-
-  // Print(_DNormal,"Filter after Backproject transforming: '%s'\n",NewImage->FileName);
-  Print(_DNormal,"Sinogram dimensions: M:%i N:%i\n",NewImage->M,NewImage->N);  // 320x135
-
-  // M1=N1=(int)((NewImage->N-1)/(float)sqrt(2))+1;
-  Print(_DNormal,"Backprojected image dim.: M:%i N:%i\n",IniFile.XSamples,IniFile.YSamples); //61x105
-  
-  OldHeight=IniFile.XSamples;
-  OldWidth =IniFile.YSamples;
-  XSamples1=1<<(int)(log(IniFile.XSamples)/log(2)+1);
-  YSamples1=1<<(int)(log(IniFile.YSamples)/log(2)+1);
-  Xmin1=IniFile.Xmin+((int)((OldHeight-XSamples1-1)/2))*IniFile.DeltaX;
-  Ymin1=IniFile.Ymin+((int)((OldWidth-YSamples1-1)/2))*IniFile.DeltaY;
-
-
-  /* Allocate new image, and put transformation parameters in it*/
-  InvMyImage=NewFloatImage("RecImage",XSamples1,YSamples1,_RealArray);  // Change
-  InvMyImage->Xmin=Xmin1;
-  InvMyImage->Ymin=Ymin1;
-  InvMyImage->DeltaX=IniFile.DeltaX;
-  InvMyImage->DeltaY=IniFile.DeltaY;
-
-
-
-  Image *NewImagecpy;
-  NewImagecpy = CopyImage(NewImage);  // NewImagecpy = NewImage;  // Both changes
-  
-  Print(_DNormal,"\nOriginal NewImage dimensions: M:%i N:%i\n",NewImage->M,NewImage->N);  // 320x135
-  BackProject(NewImage,InvMyImage);
-  Print(_DNormal,"Original NewImage dimensions: M:%i N:%i\n",NewImage->M,NewImage->N);  // 320x157
-
-
-
-
-  double **eig;
-  int eigen_M = InvMyImage->M;
-  int eigen_N = InvMyImage->N;
-  MAKE_2ARRAY(eig, (size_t)eigen_M, (size_t)eigen_N);
-  printf("eig dim %d, %d\n", eigen_M, eigen_N);  // 64x128
-  printf("\nCase 1 NewImagecpy-> M %d, NewImagecpy-> N %d\n", NewImagecpy->M, NewImagecpy->N);  // 320x135
-  filter_new(NewImagecpy, eig);
-  printf("\nCase 2 NewImagecpy-> M %d, NewImagecpy-> N %d\n", NewImagecpy->M, NewImagecpy->N);  // 320x157
-  FREE_MATRIX(eig);
-
-  // // Printing eig coming from filter_new
-  // FILE *ffile;
-  // ffile=fopen("eig_in_backprojection.dat","w");
-  // for(i=0; i<InvMyImage->M; ++i){
-  //   for(int j=0; j<InvMyImage->N; ++j){
-  //     fprintf(ffile,"%f ", eig[i][j]);
-  //   }
-  // }
-  // fclose(ffile);
-  // FREE_MATRIX(eig);
-
-
-
-
-  
-  /* Filter the backprojected image */
-  FFTImage(InvMyImage,_FFT);
-
-  CenterM=InvMyImage->M/2;
-  CenterN=InvMyImage->N/2;
-  Resx=FloatVector(InvMyImage->M);
-  Resy=FloatVector(InvMyImage->N);
-  
-  for(m=0;m<InvMyImage->M;m++) {
-    mm=m;
-    if(mm>=CenterM) mm=InvMyImage->M-m;
-    Resx[m]=(((float)mm)/InvMyImage->M)*(((float)mm)/InvMyImage->M)/
-      (InvMyImage->DeltaX*InvMyImage->DeltaX);
-  }
-  
-  for(n=0;n<InvMyImage->N;n++) {
-    nn=n;
-    if(nn>=CenterN) nn=InvMyImage->N-n;
-    Resy[n]=(((float)nn)/InvMyImage->N)*(((float)nn)/InvMyImage->N)/
-      (InvMyImage->DeltaY*InvMyImage->DeltaY);
-  }
-  
-  for(m=0;m<InvMyImage->M;m++) {
-    TempFloat=Resx[m];
-    TempPoint=InvMyImage->Signal[m];
-    for(n=0,i=0;n<InvMyImage->N;n++) {
-      Res=sqrt(TempFloat+Resy[n]);
-      /*Print(_DDebug,"Res %5.5f\n",Res);*/
-      TempPoint[i++]*=Res;
-      TempPoint[i++]*=Res;
-    }
-  }
-
-  FFTImage(InvMyImage,_IFFT);
-  Print(_DNormal,"Original InvMyImage dimensions after iFFT: M:%i N:%i\n",InvMyImage->M,InvMyImage->N);  // 128x128
-  ShrinkImage(InvMyImage,OldHeight,OldWidth,_MiddleMiddle); 
-  Print(_DNormal,"Original InvMyImage dimensions after shrinkimage: M:%i N:%i\n",InvMyImage->M,InvMyImage->N);  // 65x105
-  RealImage(InvMyImage);
-
-  //NormImage(InvMyImage,1.0,-MeanValue(InvMyImage));  // Change
-  //PrintStats(_DDetail,InvMyImage);
-  Free(Resx);
-  Free(Resy);
-  
-
-
-
-
-
-
-
-
-
-  Print(_DNormal,"Using Filtering after Backprojection\n");
-  // InvNewImage=BackFilter(NewImage);
-  // ScaleImage(InvNewImage);
-  // PrintStats(_DDetail,InvNewImage);
-  // ImageToFloat(OutImage, InvNewImage);
-  // FreeImage(InvNewImage);
-
-  ScaleImage(InvMyImage);
-  PrintStats(_DDetail,InvMyImage);
-  ImageToFloat(OutImage, InvMyImage);
-  FreeImage(InvMyImage);
-  
-
-  
-  FreeImage(NewImage);
-  FreeImage(NewImagecpy);
+  FreeImage(NewImagecpy);  
   Print(_DNormal,"return to R.          \n");
 
 }
