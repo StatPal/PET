@@ -76,6 +76,28 @@ Image *BackProjection(Image *MyImage)
 
 
 
+Image *BackProjection_same_dim(Image *MyImage)
+{
+  int OldHeight,OldWidth,XSamples,YSamples;
+  Image *InvMyImage;
+  
+  OldHeight=IniFile.XSamples;
+  OldWidth =IniFile.YSamples;
+  XSamples=IniFile.XSamples;
+  YSamples=IniFile.YSamples;
+
+  /* Allocate new image, and put transformation parameters in it*/
+  InvMyImage=NewFloatImage("RecImage",XSamples,YSamples,_RealArray);  // Change
+  InvMyImage->Xmin=IniFile.Xmin;
+  InvMyImage->Ymin=IniFile.Ymin;
+  InvMyImage->DeltaX=IniFile.DeltaX;
+  InvMyImage->DeltaY=IniFile.DeltaY;
+
+  BackProject(MyImage,InvMyImage);
+  return(InvMyImage);
+}
+
+
 
 
 
@@ -150,6 +172,52 @@ void filter_new(Image *MyImage, double **eig){
 
 
 
+void filter_new_same_dim(Image *MyImage, double **eig){
+
+  int i,m,n,mm,nn;
+  int CenterM,CenterN;
+  float *Resx,*Resy,TempFloat,*TempPoint;
+
+  Image *InvMyImage;
+  InvMyImage = BackProjection_same_dim(MyImage);
+
+  /* Eigenvalues of the Filter(K'K) of the backprojected image */
+  FFTImage(InvMyImage,_FFT);  // InvMyImage -> V' InvMyImage  // Is this necessary here??
+  CenterM=InvMyImage->M/2;
+  CenterN=InvMyImage->N/2;
+
+  Resx=FloatVector(InvMyImage->M);
+  Resy=FloatVector(InvMyImage->N);
+  
+  for(m=0;m<InvMyImage->M;m++) {
+    mm=m;
+    if(mm>=CenterM) mm=InvMyImage->M-m;
+    Resx[m]=(((float)mm)/InvMyImage->M)*(((float)mm)/InvMyImage->M)/
+      (InvMyImage->DeltaX*InvMyImage->DeltaX);
+  }
+  
+  for(n=0;n<InvMyImage->N;n++) {
+    nn=n;
+    if(nn>=CenterN) nn=InvMyImage->N-n;
+    Resy[n]=(((float)nn)/InvMyImage->N)*(((float)nn)/InvMyImage->N)/
+      (InvMyImage->DeltaY*InvMyImage->DeltaY);
+  }
+
+  for(m=0;m<InvMyImage->M;m++) {
+    TempFloat=Resx[m];
+    // // I think n and i are same in this loop
+    for(n=0,i=0;n<InvMyImage->N;n++) {
+      eig[m][i]=sqrt(TempFloat+Resy[n]);
+      i++;
+    }
+  }
+  FreeImage(InvMyImage);
+  Free(Resx);
+  Free(Resy);
+}
+
+
+
 /***************************************************************************
 ***************************************************************************/
 void iradon_smoothed_C(double *InImage, double *OutImage, char **mode, int *InterPol , char **FilterTyp, char **DebugLevel, double *Xmin, double *Ymin, double *DeltaX, double *DeltaY, int *M, int *N, int *XSamples, int *YSamples)
@@ -161,82 +229,86 @@ void iradon_smoothed_C(double *InImage, double *OutImage, char **mode, int *Inte
 
 
 
-// void only_BackProject_C(double *InImage, double *OutImage, char **mode, int *InterPol , char **FilterTyp, char **DebugLevel, double *Xmin, double *Ymin, double *DeltaX, double *DeltaY, int *M, int *N, int *XSamples, int *YSamples)
-// {
-//   Image *NewImage;
-  
-//   if (strstr(*DebugLevel,"HardCore")) DebugNiveau=_DHardCore;
-//   else DebugNiveau=_DNormal;
-//   ReadIradonArgs("RadonData",*mode, *DebugLevel, InterPol, *FilterTyp, Xmin, Ymin, DeltaX, DeltaY, XSamples, YSamples); 
+void BackProject_C_orig_dim(double *InImage, double *OutImage, double *backfilter, double *eig_out, int *Xdim_modified, int *Ydim_modified, 
+                      char **mode, int *InterPol , char **FilterTyp, char **DebugLevel, double *Xmin, double *Ymin, double *DeltaX, double *DeltaY, int *M, int *N, int *XSamples, int *YSamples)
+{
+  Image *NewImage;
+  ReadIradonArgs("RadonData",*mode, *DebugLevel, InterPol, *FilterTyp, Xmin, Ymin, DeltaX, DeltaY, XSamples, YSamples); 
 
-//   // initialization of radon-image
-//   NewImage=NewFloatImage(IniFile.InFile, *M, *N,_RealArray);
-//   RDoubleToImage(NewImage, InImage, *M, *N );
-//   InitImage(NewImage);
+  // initialization of radon-image
+  NewImage=NewFloatImage(IniFile.InFile, *M, *N,_RealArray);
+  RDoubleToImage(NewImage, InImage, *M, *N );
+  InitImage(NewImage);
   
 
-
-
-//   // Instead of Backfilter
-//   int i,m,n,mm,nn,OldHeight,OldWidth;
-//   int XSamples1,YSamples1,CenterM,CenterN;
-//   float Xmin1,Ymin1,Res;
-//   Image *InvMyImage;
-
-//   // Print(_DNormal,"Sinogram dimensions: M:%i N:%i\n",NewImage->M,NewImage->N);  // 320x135  
-//   OldHeight=IniFile.XSamples;
-//   OldWidth =IniFile.YSamples;
-//   XSamples1=1<<(int)(log(IniFile.XSamples)/log(2)+1);
-//   YSamples1=1<<(int)(log(IniFile.YSamples)/log(2)+1);
-//   Xmin1=IniFile.Xmin+((int)((OldHeight-XSamples1-1)/2))*IniFile.DeltaX;
-//   Ymin1=IniFile.Ymin+((int)((OldWidth-YSamples1-1)/2))*IniFile.DeltaY;
-
-//   /* Allocate new image, and put transformation parameters in it*/
-//   InvMyImage=NewFloatImage("RecImage",XSamples1,YSamples1,_RealArray);  // Change
-//   InvMyImage->Xmin=Xmin1;
-//   InvMyImage->Ymin=Ymin1;
-//   InvMyImage->DeltaX=IniFile.DeltaX;
-//   InvMyImage->DeltaY=IniFile.DeltaY;
-
-//   Image *NewImagecpy;
-//   NewImagecpy = CopyImage(NewImage);  // NewImagecpy = NewImage;  // Both changes
+  // Instead of Backfilter
+  int i,m,n,OldHeight,OldWidth,XSamples1,YSamples1;
+  Image *InvMyImage, *NewImagecpy;
   
-//   Print(_DNormal,"\nOriginal NewImage dimensions: M:%i N:%i\n",NewImage->M,NewImage->N);  // 320x135
-//   BackProject(NewImage,InvMyImage);
-//   Print(_DNormal,"Original NewImage dimensions: M:%i N:%i\n",NewImage->M,NewImage->N);  // 320x157
+  OldHeight=IniFile.XSamples;
+  OldWidth =IniFile.YSamples;
+  XSamples1=IniFile.XSamples;
+  YSamples1=IniFile.YSamples;
+
+  /* Allocate new image, and put transformation parameters in it*/
+  InvMyImage=NewFloatImage("RecImage",XSamples1,YSamples1,_RealArray);  // Change
+  InvMyImage->Xmin=IniFile.Xmin;
+  InvMyImage->Ymin=IniFile.Ymin;
+  InvMyImage->DeltaX=IniFile.DeltaX;
+  InvMyImage->DeltaY=IniFile.DeltaY;
 
 
-
-
-//   double **eig;
-//   int eigen_M = InvMyImage->M;
-//   int eigen_N = InvMyImage->N;
-//   MAKE_2ARRAY(eig, (size_t)eigen_M, (size_t)eigen_N);
-//   printf("eig dim %d, %d\n", eigen_M, eigen_N);  // 64x128
-//   printf("\nCase 1 NewImagecpy-> M %d, NewImagecpy-> N %d\n", NewImagecpy->M, NewImagecpy->N);  // 320x135
-//   filter_new(NewImagecpy, eig);
-//   printf("\nCase 2 NewImagecpy-> M %d, NewImagecpy-> N %d\n", NewImagecpy->M, NewImagecpy->N);  // 320x157
-//   FREE_MATRIX(eig);
-
-
-
-//   // Print(_DNormal,"Original InvMyImage dimensions after iFFT: M:%i N:%i\n",InvMyImage->M,InvMyImage->N);  // 128x128
-//   ShrinkImage(InvMyImage,OldHeight,OldWidth,_MiddleMiddle); 
-//   Print(_DNormal,"Original InvMyImage dimensions after shrinkimage: M:%i N:%i\n",InvMyImage->M,InvMyImage->N);  // 65x105
-//   RealImage(InvMyImage);
-
-//   //NormImage(InvMyImage,1.0,-MeanValue(InvMyImage));  // Change
-//   //PrintStats(_DDetail,InvMyImage);
+  NewImagecpy = CopyImage(NewImage);  // NewImagecpy = NewImage;  // Both changes  
+  Print(_DNormal,"\nOriginal NewImage dimensions: M:%i N:%i\n",NewImage->M,NewImage->N);  // 320x135
+  BackProject(NewImage,InvMyImage);
+  Print(_DNormal,"Original NewImage dimensions: M:%i N:%i\n",NewImage->M,NewImage->N);  // 320x157
   
+  ImageToFloat(backfilter, InvMyImage);  // NEW output to R
+  // Do it by hand
 
-//   ScaleImage(InvMyImage);
-//   PrintStats(_DDetail,InvMyImage);
-//   ImageToFloat(OutImage, InvMyImage);
-//   FreeImage(InvMyImage);
+
+
+
+  double **eig;
+  int eigen_M = InvMyImage->M, eigen_N = InvMyImage->N;
+  MAKE_2ARRAY(eig, (size_t)eigen_M, (size_t)eigen_N);
+  printf("eig dim %d, %d\n", eigen_M, eigen_N);  // 64x128
+  printf("\nCase 1 NewImagecpy-> M %d, NewImagecpy-> N %d\n", NewImagecpy->M, NewImagecpy->N);  // 320x135
+  filter_new_same_dim(NewImagecpy, eig);
+  printf("\nCase 2 NewImagecpy-> M %d, NewImagecpy-> N %d\n", NewImagecpy->M, NewImagecpy->N);  // 320x157
+ 
   
-//   FreeImage(NewImage);
-//   FreeImage(NewImagecpy);
-// }
+  /* Filter the backprojected image */
+  FFTImage(InvMyImage,_FFT);
+
+  for(m=0;m<InvMyImage->M;m++) {
+    for(n=0,i=0;n<InvMyImage->N;n++) {
+      InvMyImage->Signal[m][i++]*=eig[m][n];
+      InvMyImage->Signal[m][i++]*=eig[m][n];
+      // A small difference is due to being double instead of float
+    }
+  }
+  vectorize(eigen_M, eigen_N, eig, eig_out);  // output to R
+  FREE_MATRIX(eig);
+
+
+  FFTImage(InvMyImage,_IFFT);
+  Print(_DNormal,"Original InvMyImage dimensions after iFFT: M:%i N:%i\n",InvMyImage->M,InvMyImage->N);  // 128x128
+  ShrinkImage(InvMyImage,OldHeight,OldWidth,_MiddleMiddle); 
+  Print(_DNormal,"Original InvMyImage dimensions after shrinkimage: M:%i N:%i\n",InvMyImage->M,InvMyImage->N);  // 65x105
+  RealImage(InvMyImage);
+
+
+  ScaleImage(InvMyImage);
+  PrintStats(_DDetail,InvMyImage);
+  ImageToFloat(OutImage, InvMyImage);
+  FreeImage(InvMyImage);
+  
+  FreeImage(NewImage);
+  FreeImage(NewImagecpy);
+
+  Print(_DNormal,"return to R.          \n");
+}
 
 
 
