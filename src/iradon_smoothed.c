@@ -50,11 +50,11 @@ Image *BackProjection(Image *MyImage)
   Image *InvMyImage;
 
   // Print(_DNormal,"Backproject transforming: '%s'\n",MyImage->FileName);
-  Print(_DNormal,"\nMyImage dimensions in Backprojection 1: M:%i N:%i\n",MyImage->M,MyImage->N);
+  // Print(_DNormal,"\nMyImage dimensions in Backprojection 1: M:%i N:%i\n",MyImage->M,MyImage->N);
 
   //M=N=(int)((MyImage->N-1)/(float)sqrt(2))+1;
 
-  Print(_DNormal,"Backprojected image dim.: M:%i N:%i\n",IniFile.XSamples,IniFile.YSamples);
+  // Print(_DNormal,"Backprojected image dim.: M:%i N:%i\n",IniFile.XSamples,IniFile.YSamples);
   
   OldHeight=IniFile.XSamples;
   OldWidth =IniFile.YSamples;
@@ -123,23 +123,23 @@ void filter_new(Image *MyImage, double **eig){
 
   // double **eig;
   // MAKE_2ARRAY(eig, (size_t)InvMyImage->M, (size_t)InvMyImage->N);
-  Print(_DNormal,"InvMyImage dimensions: M:%i N:%i\n",InvMyImage->M,InvMyImage->N);  // 256 256
+  // Print(_DNormal,"InvMyImage dimensions: M:%i N:%i\n",InvMyImage->M,InvMyImage->N);  // 256 256
 
-	FILE *ffile;
-  ffile=fopen("eigens_inside_filter.dat","w");
+	// FILE *ffile;
+  // ffile=fopen("eigens_inside_filter.dat","w");
   for(m=0;m<InvMyImage->M;m++) {
     TempFloat=Resx[m];
-    // TempPoint=InvMyImage->Signal[m];
+    // // TempPoint=InvMyImage->Signal[m];
 
-    // I think n and i are same in this loop
+    // // I think n and i are same in this loop
     for(n=0,i=0;n<InvMyImage->N;n++) {
       // eig[m][i++]=sqrt(TempFloat+Resy[n]);
       eig[m][i]=sqrt(TempFloat+Resy[n]);
-      fprintf(ffile,"%f ", eig[m][i]);
+      // fprintf(ffile,"%f ", eig[m][i]);
       i++;
     }
   }
-  fclose(ffile);
+  // fclose(ffile);
 
   FreeImage(InvMyImage);
   Free(Resx);
@@ -278,9 +278,9 @@ void BackProjection_C_shrinked(double *InImage, double *OutImage, double *backfi
 
 
   NewImagecpy = CopyImage(NewImage);  // NewImagecpy = NewImage;  // Both changes  
-  Print(_DNormal,"\nOriginal NewImage dimensions: M:%i N:%i\n",NewImage->M,NewImage->N);  // 320x135
+  // Print(_DNormal,"\nOriginal NewImage dimensions: M:%i N:%i\n",NewImage->M,NewImage->N);  // 320x135
   BackProject(NewImage,InvMyImage);
-  Print(_DNormal,"Original NewImage dimensions: M:%i N:%i\n",NewImage->M,NewImage->N);  // 320x157
+  // Print(_DNormal,"Original NewImage dimensions: M:%i N:%i\n",NewImage->M,NewImage->N);  // 320x157
   
   ShrinkImage(InvMyImage,OldHeight,OldWidth,_MiddleMiddle);
   ImageToFloat(backfilter, InvMyImage);  // NEW output to R
@@ -292,7 +292,7 @@ void BackProjection_C_shrinked(double *InImage, double *OutImage, double *backfi
   double **eig;
   int eigen_M = InvMyImage->M, eigen_N = InvMyImage->N;
   MAKE_2ARRAY(eig, (size_t)eigen_M, (size_t)eigen_N);
-  printf("eig dim %d, %d\n", eigen_M, eigen_N);  // 64x128
+  // printf("eig dim %d, %d\n", eigen_M, eigen_N);  // 64x128
   // printf("\nCase 1 NewImagecpy-> M %d, NewImagecpy-> N %d\n", NewImagecpy->M, NewImagecpy->N);  // 320x135
   filter_new(NewImagecpy, eig);
   // printf("\nCase 2 NewImagecpy-> M %d, NewImagecpy-> N %d\n", NewImagecpy->M, NewImagecpy->N);  // 320x157
@@ -335,7 +335,7 @@ void BackProjection_C_shrinked(double *InImage, double *OutImage, double *backfi
   FFTImage(InvMyImage,_IFFT);
   // Print(_DNormal,"Original InvMyImage dimensions after iFFT: M:%i N:%i\n",InvMyImage->M,InvMyImage->N);  // 128x128
   ShrinkImage(InvMyImage,OldHeight,OldWidth,_MiddleMiddle); 
-  Print(_DNormal,"Original InvMyImage dimensions after shrinkimage: M:%i N:%i\n",InvMyImage->M,InvMyImage->N);  // 65x105
+  // Print(_DNormal,"Original InvMyImage dimensions after shrinkimage: M:%i N:%i\n",InvMyImage->M,InvMyImage->N);  // 65x105
   RealImage(InvMyImage);
 
 
@@ -347,7 +347,7 @@ void BackProjection_C_shrinked(double *InImage, double *OutImage, double *backfi
   FreeImage(NewImage);
   FreeImage(NewImagecpy);
 
-  Print(_DNormal,"return to R.          \n");
+  // Print(_DNormal,"return to R.          \n");
 }
 
 
@@ -392,9 +392,9 @@ void BackProjection_C(double *InImage, double *OutImage, double *backfilter, dou
 
 
   NewImagecpy = CopyImage(NewImage);  // NewImagecpy = NewImage;  // Both changes  
-  Print(_DNormal,"\nOriginal NewImage dimensions: M:%i N:%i\n",NewImage->M,NewImage->N);  // 320x135
+  // Print(_DNormal,"\nOriginal NewImage dimensions: M:%i N:%i\n",NewImage->M,NewImage->N);  // 320x135
   BackProject(NewImage,InvMyImage);
-  Print(_DNormal,"Original NewImage dimensions: M:%i N:%i\n",NewImage->M,NewImage->N);  // 320x157
+  // Print(_DNormal,"Original NewImage dimensions: M:%i N:%i\n",NewImage->M,NewImage->N);  // 320x157
   
   ImageToFloat(backfilter, InvMyImage);  // NEW output to R
   // Do it by hand
@@ -405,7 +405,7 @@ void BackProjection_C(double *InImage, double *OutImage, double *backfilter, dou
   double **eig;
   int eigen_M = InvMyImage->M, eigen_N = InvMyImage->N;
   MAKE_2ARRAY(eig, (size_t)eigen_M, (size_t)eigen_N);
-  printf("eig dim %d, %d\n", eigen_M, eigen_N);  // 64x128
+  // printf("eig dim %d, %d\n", eigen_M, eigen_N);  // 64x128
   // printf("\nCase 1 NewImagecpy-> M %d, NewImagecpy-> N %d\n", NewImagecpy->M, NewImagecpy->N);  // 320x135
   filter_new(NewImagecpy, eig);
   // printf("\nCase 2 NewImagecpy-> M %d, NewImagecpy-> N %d\n", NewImagecpy->M, NewImagecpy->N);  // 320x157
@@ -428,7 +428,7 @@ void BackProjection_C(double *InImage, double *OutImage, double *backfilter, dou
   FFTImage(InvMyImage,_IFFT);
   // Print(_DNormal,"Original InvMyImage dimensions after iFFT: M:%i N:%i\n",InvMyImage->M,InvMyImage->N);  // 128x128
   ShrinkImage(InvMyImage,OldHeight,OldWidth,_MiddleMiddle); 
-  Print(_DNormal,"Original InvMyImage dimensions after shrinkimage: M:%i N:%i\n",InvMyImage->M,InvMyImage->N);  // 65x105
+  // Print(_DNormal,"Original InvMyImage dimensions after shrinkimage: M:%i N:%i\n",InvMyImage->M,InvMyImage->N);  // 65x105
   RealImage(InvMyImage);
 
 
@@ -440,7 +440,7 @@ void BackProjection_C(double *InImage, double *OutImage, double *backfilter, dou
   FreeImage(NewImage);
   FreeImage(NewImagecpy);
 
-  Print(_DNormal,"return to R.          \n");
+  // Print(_DNormal,"return to R.          \n");
 }
 
 

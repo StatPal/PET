@@ -56,7 +56,7 @@ void BackProject(Image *Sinogram, Image *InvMyImage)
   float Xmin,Ymin,DeltaX,DeltaY,Rho,DeltaRho,RhoMax,TempSin,TempCos,sum;
   float *datam,*datan,*datat;
 
-  Print(_DNormal,"Backprojecting sinogram...\n");
+  // Print(_DNormal,"Backprojecting sinogram...\n");
   PrintStats(_DDetail,Sinogram);
   //PrintStats(_DDetail,InvMyImage);
 
@@ -99,7 +99,7 @@ void BackProject(Image *Sinogram, Image *InvMyImage)
   Print(_DDetail,"Integrating... \n");
   for (m=0; m<XSamples; m++) {
     //printf("(%.2f pct. done) \r", (float)(m+1)/XSamples*100);
-    if (m%5==0) Print(_DNormal,"(%.2f pct. done) \r", (float)(m+1)/XSamples*100);  
+    // if (m%5==0) Print(_DNormal,"(%.2f pct. done) \r", (float)(m+1)/XSamples*100);  
     datam=XCosTable->Signal[m];
     for (n=0; n<YSamples; n++) {
       datan=YSinTable->Signal[n];

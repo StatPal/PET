@@ -1,7 +1,7 @@
 ## Calling from C
 
 Backproj_R <- function(rData, XSamples, YSamples, 
-                   mode="FB", 
+                   mode="BF", 
                    Xmin=-sqrt(0.5)*(ncol(rData)/XSamples)*0.5*(XSamples-1), 
                    Ymin=-sqrt(0.5)*(ncol(rData)/YSamples)*0.5*(YSamples-1), 
                    DeltaX=sqrt(0.5)*(ncol(rData)/XSamples), 
@@ -106,7 +106,7 @@ Backproj_R <- function(rData, XSamples, YSamples,
 
     
       irdat <- scaleImage(matrix(irdat,nrow=XSamples,ncol=YSamples, byrow=TRUE))
-      print(c(Xsample_modified, Ysample_modified))
+    #   print(c(Xsample_modified, Ysample_modified))
       z <- list(irData=irdat,
             backfilter=matrix(backfilter, Xsample_modified, Ysample_modified, byrow=T),
             filter=matrix(eigenvals, Xsample_modified, Ysample_modified, byrow=T),
@@ -210,8 +210,8 @@ Backproj_R_shrinked <- function(rData, XSamples, YSamples,
       irData <-.C("BackProjection_C_shrinked", 
                  as.double(rData), 
                  dat=double(XSamples*YSamples), 
-                 backfilter=as.double(matrix(0, Xsample, Ysample)),
-                 eigen_out=as.double(matrix(0, Xsample, Ysample)), 
+                 backfilter=as.double(matrix(0, XSamples, YSamples)),
+                 eigen_out=as.double(matrix(0, XSamples, YSamples)), 
                  Xsample_modified = as.integer(1),
                  Ysample_modified = as.integer(1),
                  as.character(mode),
@@ -236,10 +236,10 @@ Backproj_R_shrinked <- function(rData, XSamples, YSamples,
 
     
       irdat <- scaleImage(matrix(irdat,nrow=XSamples,ncol=YSamples, byrow=TRUE))
-      print(c(Xsample, Ysample))
+      print(c(XSamples, YSamples))
       z <- list(irData=irdat,
-            backfilter=matrix(backfilter, Xsample, Ysample, byrow=T),
-            filter=matrix(eigenvals, Xsample, Ysample, byrow=T),
+            backfilter=matrix(backfilter, XSamples, YSamples, byrow=T),
+            filter=matrix(eigenvals, XSamples, YSamples, byrow=T),
             Header=list(SignalDim=c(XSamples, YSamples), 
                         XYmin=c(Xmin, Ymin), 
                         DeltaXY=c(DeltaX, DeltaY)), 
