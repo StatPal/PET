@@ -254,7 +254,7 @@ void BackProjection_C_shrinked(double *InImage, double *OutImage, double *backfi
   // Instead of Backfilter
   int i,m,n,OldHeight,OldWidth,XSamples1,YSamples1;
   float Xmin1,Ymin1;
-  Image *InvMyImage, *NewImagecpy;
+  Image *InvMyImage, *NewImagecpy, *InvMyImagecpy;
 
   // Print(_DNormal,"Sinogram dimensions: M:%i N:%i\n",NewImage->M,NewImage->N);  // 320x135
   // Print(_DNormal,"Backprojected image dim.: M:%i N:%i\n",IniFile.XSamples,IniFile.YSamples); //61x105
@@ -282,11 +282,13 @@ void BackProjection_C_shrinked(double *InImage, double *OutImage, double *backfi
   BackProject(NewImage,InvMyImage);
   // Print(_DNormal,"Original NewImage dimensions: M:%i N:%i\n",NewImage->M,NewImage->N);  // 320x157
   
-  ShrinkImage(InvMyImage,OldHeight,OldWidth,_MiddleMiddle);
-  ImageToFloat(backfilter, InvMyImage);  // NEW output to R
-  // Do it by hand
-
-
+  NewImagecpy = CopyImage(NewImage);
+  InvMyImagecpy = CopyImage(InvMyImage);
+  ShrinkImage(InvMyImagecpy,OldHeight,OldWidth,_MiddleMiddle);
+  // Oh!! I see where the error is, after this Shrinking, the next dim are changing.
+  // Copy this and store and then free
+  ImageToFloat(backfilter, InvMyImagecpy);  // NEW output to R
+  FreeImage(InvMyImagecpy);
 
 
   double **eig;
@@ -296,8 +298,8 @@ void BackProjection_C_shrinked(double *InImage, double *OutImage, double *backfi
   // printf("\nCase 1 NewImagecpy-> M %d, NewImagecpy-> N %d\n", NewImagecpy->M, NewImagecpy->N);  // 320x135
   filter_new(NewImagecpy, eig);
   // printf("\nCase 2 NewImagecpy-> M %d, NewImagecpy-> N %d\n", NewImagecpy->M, NewImagecpy->N);  // 320x157
- 
-  
+
+
   /* Filter the backprojected image */
   FFTImage(InvMyImage,_FFT);
 
@@ -314,17 +316,18 @@ void BackProjection_C_shrinked(double *InImage, double *OutImage, double *backfi
   // There is a multiple thing going on
   double *eig_tmp;
   MAKE_1ARRAY(eig_tmp, eigen_M*eigen_N);
-  vectorize(eigen_M, eigen_N, eig, eig_tmp);  // output to R
+  vectorize(eigen_M, eigen_N, eig, eig_tmp);  // vectorize eig to eig_tmp
 
   // To use Shrinkimage on eigen, we can turn it into a image first
   Image *eigen_Image;
   eigen_Image=NewFloatImage(IniFile.InFile, eigen_M, eigen_M, _RealArray);// initialization of radon-image
-  RDoubleToImage(eigen_Image, eig_tmp, eigen_M, eigen_N );
+  RDoubleToImage(eigen_Image, eig_tmp, eigen_M, eigen_N );  // Put eig_tmp to eigen_Image
   InitImage(eigen_Image);
 
   ShrinkImage(eigen_Image, OldHeight, OldWidth, _MiddleMiddle);
   ImageToFloat(eig_out, eigen_Image);  // NEW output to R
   FREE_MATRIX(eig);
+  FreeImage(eigen_Image);
   // NOT CHECKED - CHECK
 
 

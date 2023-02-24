@@ -106,7 +106,6 @@ Backproj_R <- function(rData, XSamples, YSamples,
 
     
       irdat <- scaleImage(matrix(irdat,nrow=XSamples,ncol=YSamples, byrow=TRUE))
-    #   print(c(Xsample_modified, Ysample_modified))
       z <- list(irData=irdat,
             backfilter=matrix(backfilter, Xsample_modified, Ysample_modified, byrow=T),
             filter=matrix(eigenvals, Xsample_modified, Ysample_modified, byrow=T),
@@ -200,8 +199,8 @@ Backproj_R_shrinked <- function(rData, XSamples, YSamples,
       mode=="CBF" || mode=="FB" || mode=="BF" ){
 
 
-    #    Xsample_modified <- 2^as.integer(log(XSamples)/log(2)+1)
-    #    Ysample_modified <- 2^as.integer(log(YSamples)/log(2)+1)
+       Xsample_modified <- 2^as.integer(log(XSamples)/log(2)+1)
+       Ysample_modified <- 2^as.integer(log(YSamples)/log(2)+1)
 
 
       rDataDim  <- dim(rData)
