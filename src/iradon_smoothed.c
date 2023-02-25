@@ -356,7 +356,11 @@ void BackProjection_C_shrinked(double *InImage, double *OutImage, double *backfi
   
   NewImagecpy = CopyImage(NewImage);
   InvMyImagecpy = CopyImage(InvMyImage);
+  
+  Print(_DNormal,"Original InvMyImage dimensions before shrinkimage: M:%i N:%i\n",InvMyImagecpy->M,InvMyImagecpy->N);  // 65x105
   ShrinkImage(InvMyImagecpy,OldHeight,OldWidth,_MiddleMiddle);
+  Print(_DNormal,"Original InvMyImage dimensions after shrinkimage: M:%i N:%i\n",InvMyImagecpy->M,InvMyImagecpy->N);  // 65x105
+
   // Oh!! I see where the error is, after this Shrinking, the next dim are changing.
   // Copy this and store and then free
   ImageToFloat(backfilter, InvMyImagecpy);  // NEW output to R
@@ -366,10 +370,10 @@ void BackProjection_C_shrinked(double *InImage, double *OutImage, double *backfi
   double **eig;
   int eigen_M = InvMyImage->M, eigen_N = InvMyImage->N;
   MAKE_2ARRAY(eig, (size_t)eigen_M, (size_t)eigen_N);
-  // printf("eig dim %d, %d\n", eigen_M, eigen_N);  // 64x128
-  // printf("\nCase 1 NewImagecpy-> M %d, NewImagecpy-> N %d\n", NewImagecpy->M, NewImagecpy->N);  // 320x135
+  printf("eig dim %d, %d\n", eigen_M, eigen_N);  // 64x128
+  printf("\nCase 1 NewImagecpy-> M %d, NewImagecpy-> N %d\n", NewImagecpy->M, NewImagecpy->N);  // 320x135
   filter_new(NewImagecpy, eig);
-  // printf("\nCase 2 NewImagecpy-> M %d, NewImagecpy-> N %d\n", NewImagecpy->M, NewImagecpy->N);  // 320x157
+  printf("\nCase 2 NewImagecpy-> M %d, NewImagecpy-> N %d\n", NewImagecpy->M, NewImagecpy->N);  // 320x157
 
 
   /* Filter the backprojected image */
@@ -396,7 +400,10 @@ void BackProjection_C_shrinked(double *InImage, double *OutImage, double *backfi
   RDoubleToImage(eigen_Image, eig_tmp, eigen_M, eigen_N );  // Put eig_tmp to eigen_Image
   InitImage(eigen_Image);
 
+  Print(_DNormal,"Original eigen_Image dimensions before eigen Shrink: M:%i N:%i\n",eigen_Image->M,eigen_Image->N);  // 64x64
   ShrinkImage(eigen_Image, OldHeight, OldWidth, _MiddleMiddle);
+  Print(_DNormal,"Original eigen_Image dimensions after  eigen Shrink: M:%i N:%i\n",eigen_Image->M,eigen_Image->N);  // 65x105
+
   ImageToFloat(eig_out, eigen_Image);  // NEW output to R
   FREE_MATRIX(eig);
   FreeImage(eigen_Image);
@@ -408,9 +415,9 @@ void BackProjection_C_shrinked(double *InImage, double *OutImage, double *backfi
 
 
   FFTImage(InvMyImage,_IFFT);
-  // Print(_DNormal,"Original InvMyImage dimensions after iFFT: M:%i N:%i\n",InvMyImage->M,InvMyImage->N);  // 128x128
+  Print(_DNormal,"Original InvMyImage dimensions after iFFT: M:%i N:%i\n",InvMyImage->M,InvMyImage->N);  // 128x128
   ShrinkImage(InvMyImage,OldHeight,OldWidth,_MiddleMiddle); 
-  // Print(_DNormal,"Original InvMyImage dimensions after shrinkimage: M:%i N:%i\n",InvMyImage->M,InvMyImage->N);  // 65x105
+  Print(_DNormal,"Original InvMyImage dimensions after shrinkimage: M:%i N:%i\n",InvMyImage->M,InvMyImage->N);  // 65x105
   RealImage(InvMyImage);
 
 

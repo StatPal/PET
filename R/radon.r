@@ -75,6 +75,16 @@ radon <- function(oData,
   if (nrow(oData)!=ncol(oData))
       stop("At the moment only image of quadratic form are admissible.")
 
+    ## Why this is done?
+    ## The C code gives something at least,
+    ## But does not match the markPoisson.
+    ## Is that why that is omitted?
+    ## To stop that markpoisson is wrong??
+    ## Or is there really some problem in Peter Toft's code?
+    ## Subrata
+
+
+
  ######################################### 
  # setting all parameters to setpar
 
