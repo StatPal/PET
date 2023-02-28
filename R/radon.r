@@ -72,8 +72,8 @@ radon <- function(oData,
   #    stop("DeltaRho should be less than DeltaXY/sqrt(2)")
   if (!(is.matrix(oData)))
       stop("'oData' has to be of type 'matrix'.")
-  if (nrow(oData)!=ncol(oData))
-      stop("At the moment only image of quadratic form are admissible.")
+#   if (nrow(oData)!=ncol(oData))
+#       stop("At the moment only image of quadratic form are admissible.")
 
     ## Why this is done?
     ## The C code gives something at least,

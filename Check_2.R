@@ -2,7 +2,7 @@ library(PET)
 
 P <- matrix(scan("PETcodes_Maitra/Hoff.128"), 128)
 # P <- P[34:94,12:116]  ## Bug here??
-P <- P[32:100,12:116]
+# P <- P[32:100,12:116]
 dim(P)
 
 

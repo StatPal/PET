@@ -30,14 +30,14 @@ fftGauss_2d <- function(m, n, fwhm) {
 
 
 # f -> K(V(D^{-1}f))
-U1f_PET <- function(f, filter){
+U1f_PET <- function(f, filter, ThetaSamples, RhoSamples){
     ff <- f * sqrt(filter)      # D^{-1}  # BUG, filter is multiplied, not divided
     ff <- PET:::ReFFTi2(ff)      # V
 
-    ThetaSamples <- nrow(f)
-    RhoSamples <- ncol(f)
-    print(ThetaSamples)
-    print(RhoSamples)
+    # ThetaSamples <- nrow(f)
+    # RhoSamples <- ncol(f)
+    ## This was the bug. Those were the m and n values
+
     tmp <- PET:::radon(ff, mode="LI", ThetaSamples = ThetaSamples, RhoSamples = RhoSamples)$rData  # K
     return(tmp)
 }
@@ -55,7 +55,7 @@ predictLS <- function(y, XSamples, YSamples)
     f <- PET:::Backproj_R(y, XSamples, YSamples)
     Ff <- PET:::radon(f$irData, mode="LI", ThetaSamples = ThetaSamples, RhoSamples = RhoSamples)$rData
 
-    sum(y*Ff$rData)
+    sum(y*Ff)
 }
 
 
@@ -64,32 +64,36 @@ predictLS <- function(y, XSamples, YSamples)
 # y is the sinogram
 Uty_PET <- function(y, XSamples, YSamples){  # 320x135, 69, 105
     # z1 = U_1'y = D^{-1}V'K'y
-    tmp <- PET:::Backproj_R(y, XSamples, YSamples)
+    tmp <- PET:::Backproj_R_shrinked(y, XSamples, YSamples)
 
-    cat('\n\nAfter backproject\n')
-    print(dim(tmp$backfilter))  # 128x128
-    print(dim(tmp$filter))      # 128x128
+    # cat('\n\nAfter backproject\n')
+    # print(dim(y))               # 320 x 135
+    # print(XSamples)             # 69
+    # print(dim(tmp$backfilter))  # 69 x 105  # correct
+    # print(dim(tmp$filter))      # 69 x 105  # correct
 
     Kty <- tmp$backfilter           # K'
     Uty <- PET:::ReFFTf2(Kty)       # V'
     z1 <- Uty*sqrt(tmp$filter)      # D^{-1}, filter multiplied, not divided
     # print(any(tmp$filter<=0))
 
-    print(dim(z1))              # 128x128
+    # print('dim(z1)')
+    # print(dim(z1))              # 69 x 105 # correct
     sum2 <- sum(z1^2)
     z2tz2 <- sum(y^2) - sum2
 
 
     # ## Next correction due to some reason
-    # U1f <- U1f_PET(z1, tmp$filter)
+    U1f <- U1f_PET(z1, tmp$filter, nrow(y), ncol(y))  # Same dim as z1
     # cat('\n\nHaha\n')
+    # print(dim(z1))  # 69 x 105
     # print(dim(y))   # 320 x 135
-    # print(dim(U1f)) # 128 x 128
-    # sum3 <- sum(y*U1f)
-    # sum4 <- predictLS(y, XSamples, YSamples)
-    # dum <- sqrt(sum4/sum2)
-    # Z1 = Z1 * dum;
-    # z2tz2 <- sum(y^2) - sum4
+    # print(dim(U1f)) # 69 x 105  -- WRONG, corrected now
+    sum3 <- sum(y*U1f)
+    sum4 <- predictLS(y, XSamples, YSamples)
+    dum <- sqrt(sum4/sum2)
+    z1 <- z1 * dum;
+    z2tz2 <- sum(y^2) - sum4
 
     return(list(z1 = z1, z2tz2 = z2tz2, filter = tmp$filter))
 }
