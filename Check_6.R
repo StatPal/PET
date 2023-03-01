@@ -4,39 +4,57 @@
 
 library(PET)
 
-P <- matrix(0, 64, 64)
+# P <- matrix(0, 64, 64)
 P <- matrix(0, 128, 128)
 # P <- matrix(0, 32, 32)
-P[1,1] <- 1
+# P[1,1] <- 1
+P[81,81] <- 1
 
 n <- nrow(P)
 
-rP_new <- newPoisson(P, nSample=5e5, ThetaSamples = 320, RhoSamples = 128, mode="NN")
+# Sq matrix
+unpad <- function(A){
+	n <- nrow(A)/2
+	A[(n/2):(3*n/2), (n/2):(3*n/2)]
+}
+
+orig <- matrix(scan("PETcodes_Maitra/orig.dat"), n)
+y <- matrix(scan("PETcodes_Maitra/y.dat"), 320, byrow = T)  ## Not 320
+# y <- matrix(scan("PETcodes_Maitra/Hoff.fwd"), 320, byrow=T)
+# y <- matrix(scan("PETcodes_Maitra/Hoff.fwdnonoise"), 128)
+Kty <- matrix(scan("PETcodes_Maitra/Kty.dat"), 2*n)  # padded size
+eigens <- matrix(scan("PETcodes_Maitra/eigens_Maitra.dat"), 2*n)  # padded size
+final <- matrix(scan("PETcodes_Maitra/Hoff.fwd"), n)
+final <- final/sum(final)
+
+
+
+
+rP_new <- newPoisson(P, nSample=1e7, ThetaSamples = 320, RhoSamples = 128, mode="LI")
+
+# rP_new <- y
+
+
+
 
 cat('\n\n\n\n\n Backprojected images\n')
-irP2_shrinked <- Backproj_R_shrinked(rP_new, nrow(P), ncol(P), mode="BF")
+irP2_shrinked <- Backproj_R_shrinked(rP_new, nrow(P), ncol(P), mode="BF", 
+					DeltaX=sqrt(.50)*(ncol(rP_new)/nrow(P)), 
+                   	DeltaY=sqrt(.50)*(ncol(rP_new)/ncol(P)))
 
+print(max(irP2_shrinked$filter))
 
 # cat('\n\n\n\n\n\n')
 irP3 <- iradon(rP_new, nrow(P), ncol(P), mode="BF")
 
 
-irP4 <- PET:::Smoothed_image(rP_new, nrow(P), ncol(P))
+# irP4 <- PET:::Smoothed_image(rP_new, nrow(P), ncol(P))
 
 
 
 
 pdf('Rplots.pdf', width=12, height=6)
 par(mfrow = c(1, 2))
-
-orig <- matrix(scan("PETcodes_Maitra/orig.dat"), n)
-y <- matrix(scan("PETcodes_Maitra/y.dat"), 128)  ## Not 320
-y <- matrix(scan("PETcodes_Maitra/Hoff.fwd"), 128)
-# y <- matrix(scan("PETcodes_Maitra/Hoff.fwdnonoise"), 128)
-Kty <- matrix(scan("PETcodes_Maitra/Kty.dat"), 2*n)  # padded size
-eigens <- matrix(scan("PETcodes_Maitra/eigens_Maitra.dat"), 2*n)  # padded size
-final <- matrix(scan("PETcodes_Maitra/Hoff.GCVP"), n)
-final <- final/sum(final)
 
 
 cat("Check\n\n")
@@ -52,7 +70,7 @@ rasterImage::rasterImage2(z=y)
 
 ## Backprojected
 rasterImage::rasterImage2(z=irP2_shrinked$backfilter, main = "backprojected Image")
-rasterImage::rasterImage2(z=Kty)
+rasterImage::rasterImage2(z=unpad(Kty))
 
 
 ## FFT of filter
@@ -65,21 +83,30 @@ rasterImage::rasterImage2(z=PET:::ReFFTf2(Kty))
 
 # filter
 rasterImage::rasterImage2(z=irP2_shrinked$filter, main = "Filter (Fourier domain possibly)")
-rasterImage::rasterImage2(z=1/sqrt(eigens))
+rasterImage::rasterImage2(z=unpad(1/sqrt(eigens)))
 range(irP2_shrinked$filter)
 
 
 
 ## FFT of filter
 FFT_filter <- irP2_shrinked$filter
+FFT_filter_2 <- 1/sqrt(eigens)
 rasterImage::rasterImage2(z=PET:::ReFFTf2(FFT_filter), main = "FFT of Filter")
-rasterImage::rasterImage2(z=PET:::ReFFTf2(1/sqrt(eigens)))
+rasterImage::rasterImage2(z=PET:::ReFFTf2(FFT_filter_2))
 rasterImage::rasterImage2(z=PET:::ReFFTi2(FFT_filter), main = "iFFT of Filter")
-rasterImage::rasterImage2(z=PET:::ReFFTf2(1/sqrt(eigens)))
+rasterImage::rasterImage2(z=PET:::ReFFTi2(FFT_filter_2))
+
+
+abc <- PET:::ReFFTi2(irP2_shrinked$filter)
+# abc <- PET:::ReFFTi2(array(0.1, dim=dim(irP2_shrinked$filter)))
+abc_2 <- PET:::ReFFTi2(FFT_filter_2)
+
+rasterImage::rasterImage2(z=PET:::ReFFTf2(RFASTfMRI::Gauss.smooth(abc, c(.1, .1))), main = "iFFT of Filter + Smooth + FFT")
+rasterImage::rasterImage2(z=PET:::ReFFTf2(RFASTfMRI::Gauss.smooth(abc_2, c(.1, .1))))
 
 
 # Final
 rasterImage::rasterImage2(z=irP2_shrinked$irData/sum(irP2_shrinked$irData), main = "Final estimate (without smoothing)")
 # rasterImage::rasterImage2(z=irP3$irData)
-rasterImage::rasterImage2(z=final, main = "Final estimate from previous code")
+rasterImage::rasterImage2(z=final, main = "Final estimate from previous code without smoothing")
 # rasterImage::rasterImage2(z=irP4)
