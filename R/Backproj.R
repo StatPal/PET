@@ -235,7 +235,7 @@ Backproj_R_shrinked <- function(rData, XSamples, YSamples,
 
     
       irdat <- scaleImage(matrix(irdat,nrow=XSamples,ncol=YSamples, byrow=TRUE))
-      print(c(XSamples, YSamples))
+      # print(c(XSamples, YSamples))
       z <- list(irData=irdat,
             backfilter=matrix(backfilter, XSamples, YSamples, byrow=T),
             filter=matrix(eigenvals, XSamples, YSamples, byrow=T),

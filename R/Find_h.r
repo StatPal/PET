@@ -26,6 +26,18 @@ fftGauss_2d <- function(m, n, fwhm) {
 }
 
 
+convolve_2d <- function(f, g, pre.plan=NULL) {
+
+    cf <- fft(f, inverse = FALSE)
+    cg <- fft(g, inverse = FALSE)
+
+    cf <- cf * cg * sqrt(nrow(cf) * nrow(cg))
+
+    cf <- fft(cf, inverse = TRUE)
+    cf <- cf / sqrt(length(cf))
+    return(Re(cf))
+}
+
 
 
 
@@ -129,16 +141,28 @@ Optimize_SLS_2d <- function(y, XSamples, YSamples){
       stop("'rData' has to be of type 'matrix'.")
     abstol = 1e-12; lower = 1e-6; upper = 20;
 
-    print(SLSPRESS_2d(0, y=y, XSamples=XSamples, YSamples=YSamples))
-    print(SLSPRESS_2d(1, y=y, XSamples=XSamples, YSamples=YSamples))
-    print(SLSPRESS_2d(10, y=y, XSamples=XSamples, YSamples=YSamples))
-    print(SLSPRESS_2d(20, y=y, XSamples=XSamples, YSamples=YSamples))
+    # cat("\nExample values\n")
+    # print(SLSPRESS_2d(0, y=y, XSamples=XSamples, YSamples=YSamples))
+    # print(SLSPRESS_2d(1, y=y, XSamples=XSamples, YSamples=YSamples))
+    # print(SLSPRESS_2d(10, y=y, XSamples=XSamples, YSamples=YSamples))
+    # print(SLSPRESS_2d(20, y=y, XSamples=XSamples, YSamples=YSamples))
+    ## Possible bug check
 
     fnl <- optim(1.0, SLSPRESS_2d, method="Brent", 
                 lower=lower, upper=upper, 
                 y=y, XSamples=XSamples, YSamples=YSamples)
     cat("\n\nmin = %f at %f\n", fnl$val, fnl$par)
-    return(fnl)
+    return(fnl$par)
+}
+
+
+Smoothed_image <- function(y, XSamples, YSamples){
+    tmp <- PET:::Backproj_R_shrinked(y, XSamples, YSamples)
+    fwhm <- Optimize_SLS_2d(y, XSamples, YSamples)
+    print(fwhm)
+    mat <- Gausfilter_2d(XSamples, YSamples, fwhm)
+
+    return(convolve_2d(mat, tmp$irData))
 }
 
 
