@@ -323,12 +323,18 @@ void Forward_C_orig_dim(double *sino_out, double *signal_in, double *setpar)
 					{
 						mmin=(int)ceil((N-0.5-beta-eps)/alpha);
 						mmax=1+(int)floor(-(beta+0.5-eps)/alpha);
-					}
-					else
-					{
-						mmin=0;
-						mmax=M;
-					}
+					} else
+            if ((beta>1) && (beta<M-2))
+            {
+              mmin=0;
+              mmax=M;
+            }
+            else
+            {
+              mmin=0;
+              mmax=-1;
+            }
+
 				if (mmin<0) mmin=0;
 				if (mmax>M) mmax=M;
 				nfloat=betap+mmin*alpha;
@@ -362,12 +368,17 @@ void Forward_C_orig_dim(double *sino_out, double *signal_in, double *setpar)
 					{
 						nmin=(int)ceil((M-0.5-beta-eps)/alpha);
 						nmax=1+(int)floor(-(beta+0.5-eps)/alpha);
-					}
-					else
-					{
-						nmin=0;
-						nmax=N;
-					}
+					} else 
+            if ((beta>1) && (beta<M-2))
+            {
+              nmin=0;
+              nmax=M;
+            }
+            else
+            {
+              nmin=0;
+              nmax=-1;
+            }
 				if (nmin<0) nmin=0;
 				if (nmax>N) nmax=N;
 

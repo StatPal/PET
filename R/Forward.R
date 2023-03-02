@@ -30,21 +30,20 @@ Forward_R <- function(oData,
       setpar[8,1] <- DeltaRho
       setpar[9,1] <- ThetaMin
 
-      print(setpar)
-      
+      # print(setpar)
 
 
       rdata <- .C("Forward_C_orig_dim", 
                   rdata=matrix(0, nrow=ThetaSamples, ncol=RhoSamples), 
                   as.double(oData), 
                   as.double(setpar),
-                  PACKAGE="PET")$rdata  
+                  PACKAGE="PET")$rdata
 
-    z <- list(rData=rdata, 
-                Header=list(SignalDim=c(ThetaSamples, RhoSamples), 
-                            XYmin=c(ThetaMin, RhoMin), 
-                            DeltaXY=c(DeltaTheta, DeltaRho)), 
-                call=args )
-    class(z) <- "pet"
-    return(z)
+        z <- list(rData=rdata, 
+                    Header=list(SignalDim=c(ThetaSamples, RhoSamples), 
+                                XYmin=c(ThetaMin, RhoMin), 
+                                DeltaXY=c(DeltaTheta, DeltaRho)), 
+                    call=args )
+        class(z) <- "pet"
+        return(z)
 }

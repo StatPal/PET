@@ -13,7 +13,6 @@ P[128,128] <- 1
 
 
 P <- matrix(0, 32, 32)
-# P[16,16] <- 1
 P[1,1] <- 1
 
 n <- nrow(P)
@@ -44,31 +43,30 @@ n <- nrow(P)
 
 
 # rP_new_old <- radon(P, ThetaSamples = 320, RhoSamples = 128, mode="LI")$rData
-# # rP_new_old <- newPoisson(P, nSample=1e7, ThetaSamples = 320, RhoSamples = 128, mode="LI")
-
 # rP_new_old <- PET:::Forward_R(P, ThetaSamples = 320, RhoSamples = 128, mode="LI")$rData
 
 
 
 
-#rP_new_old <- radon(P, ThetaSamples = 10, RhoSamples = 5, mode="LI")$rData
-# rP_new_old <- PET:::Forward_R(P, ThetaSamples = 10, RhoSamples = 5, mode="LI")$rData
-
-
 rP_new <- radon(P, ThetaSamples = 320, RhoSamples = 128, mode="LI")$rData
-rP_new_old <- PET:::Forward_R(P, ThetaSamples = 320, RhoSamples = 128, mode="LI", RhoMin=0, XYmin = 0, DeltaRho = 1/128)$rData
-## Original code does not work
+rP_new_old <- PET:::Forward_R(P, ThetaSamples = 320, RhoSamples = 128, mode="LI")$rData
+
+
+# rP_new <- radon(P, ThetaSamples = 320, RhoSamples = 128, mode="LI")$rData
+# rP_new_old <- PET:::Forward_R(P, ThetaSamples = 320, RhoSamples = 128, mode="LI", RhoMin=0, XYmin = 0, DeltaRho = 1/128)$rData
+# ## Original code does not work
 
 
 
 # # rP_new <- y
 # rP_new <- rP_new_old
 class(rP_new)
+dim(rP_new)
 
-image(rP_new)
-image(rP_new_old)
+image(x=1:320, y=1:128, rP_new)
+image(x=1:320, y=1:128, rP_new_old)
 
-rP_new <- t(rP_new_old)
+rP_new <- rP_new_old
 
 
 # stop()
