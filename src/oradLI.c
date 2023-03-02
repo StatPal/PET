@@ -47,7 +47,7 @@ void radonLI(double *v,double *u,double *setpar)
   Delta_rho    = setpar[7];
   theta_min    = setpar[8];
 
-  idx=1.0/Delta_x;
+  idx=1.0/Delta_x;	// Not in that code
   for(t=0; t<T;t++)   // T=ma?
   {
     theta=t*Delta_theta+theta_min;
@@ -104,7 +104,7 @@ void radonLI(double *v,double *u,double *setpar)
     }
     else                                          // Project onto y-axis
     {
-      dx_icostheta=Delta_x/fabs(costheta);        // DIFFERENT
+      dx_icostheta=Delta_x/fabs(costheta);        // DIFFERENT	// Not in that code
       alpha=-sintheta/costheta;                   // DIFFERENT
       for(r=0; r<R; r++ ) 
       {
@@ -137,6 +137,7 @@ void radonLI(double *v,double *u,double *setpar)
         sum=0.0;
         for (n=nmin;n<nmax;n++)
         {
+          // Not in that code
           mfloat=beta+n*alpha;
           m=(int)mfloat;
           reldx=(mfloat-m)*idx;

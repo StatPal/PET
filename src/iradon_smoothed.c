@@ -214,7 +214,8 @@ void matricize(int m, int n, double **a, double *b){
 
 
 
-void Forward(Image *MyImage,Image *MySino)
+// void Forward(Image *MyImage,Image *MySino)
+void Forward_C_orig_dim(double *sino_out, double *signal_in, double *setpar)
 {
 	int t,r,m,n,mmin,mmax,nmin,nmax;
 	int T,R,M,N;
@@ -224,27 +225,78 @@ void Forward(Image *MyImage,Image *MySino)
 	float **signal,**sino;
 
 	eps=1e-4;
-	T=MySino->M;
-	R=MySino->N;
-	M=N=MyImage->M;
+	// T=MySino->M;
+	// R=MySino->N;
+	// M=N=MyImage->M;
 
-	rho_min=MySino->Ymin;
-	Delta_theta=M_PI/T;
-	Delta_rho=MySino->DeltaY;
+	// rho_min=MySino->Ymin;
+	// Delta_theta=M_PI/T;
+	// Delta_rho=MySino->DeltaY;
 
-	x_min=MyImage->Xmin;
-	Delta_x=MyImage->DeltaX;
-	signal=MyImage->Signal;
-	sino=MySino->Signal;
+	// x_min=MyImage->Xmin;
+	// Delta_x=MyImage->DeltaX;
 
-	printf("Sino X=%i DX=%f Xmin=%f\n",MySino->M,MySino->DeltaX,MySino->Xmin);
-	printf("Sino Y=%i DY=%f Ymin=%f\n",MySino->N,MySino->DeltaY,MySino->Ymin);
-	printf("Image X=%i DX=%f Xmin=%f\n",MyImage->M,MyImage->DeltaX,MyImage->Xmin);
-	printf("Image Y=%i DY=%f Ymin=%f\n",MyImage->N,MyImage->DeltaY,MyImage->Ymin);
+	// printf("Sino X=%i DX=%f Xmin=%f\n",MySino->M,MySino->DeltaX,MySino->Xmin);
+	// printf("Sino Y=%i DY=%f Ymin=%f\n",MySino->N,MySino->DeltaY,MySino->Ymin);
+	// printf("Image X=%i DX=%f Xmin=%f\n",MyImage->M,MyImage->DeltaX,MyImage->Xmin);
+	// printf("Image Y=%i DY=%f Ymin=%f\n",MyImage->N,MyImage->DeltaY,MyImage->Ymin);
+
+
+  // printf("Sino X=%i DX=%f Xmin=%f\n", T, MySino->DeltaX, MySino->Xmin);
+	// printf("Sino Y=%i DY=%f Ymin=%f\n", R, Delta_rho, rho_min);
+	// printf("Image X=%i DX=%f Xmin=%f\n", M, Delta_x,MyImage->Xmin);
+	// printf("Image Y=%i DY=%f Ymin=%f\n", N,MyImage->DeltaY,MyImage->Ymin);
+
+	
+  M            = setpar[0];
+  N = M;
+  x_min        = setpar[1];
+  Delta_x      = setpar[2];
+  T            = setpar[3];
+  Delta_theta  = setpar[4];
+  R            = setpar[5];
+  rho_min      = setpar[6];
+  Delta_rho    = setpar[7];
+
+  float theta_min;
+  theta_min    = setpar[8];     // This was not used in Peter Toft's code. 
+  
+  printf("Sino X=%i DX=N Xmin=%f(N)\n", T, theta_min);
+	printf("Sino Y=%i DY=%f Ymin=%f\n", R, Delta_rho, rho_min);
+	printf("Image X=%i DX=%f Xmin=N\n", M, Delta_x);
+	printf("Image Y=%i DY=N Ymin=N\n", N);
+
+
+
+
+
+	// signal=MyImage->Signal;
+	// sino=MySino->Signal;
+
+  printf("Debug 0\n");
+
+  MAKE_2ARRAY(signal, M, N);
+  MAKE_2ARRAY(sino, T, R);
+
+
+  printf("Debug 1\n");
+  
+  // matricize(M, N, signal, signal_in);
+  for (int j = 0; j < N; ++j){
+    for (int i = 0; i < M; ++i){
+        signal[i][j] = signal_in[j * M + i];
+    }
+  }
+
+  printf("Debug 2\n");
+
 
 	for(t=0; t<T;t++)
 	{
 		Print(_DNormal, "Calculating: %4d of %d \r",t,T-1);
+
+    printf("\n\nCalculating t: %4d of %d \n", t, T-1);
+
 		theta=t*Delta_theta;
 		sintheta=sin(theta);
 		costheta=cos(theta);
@@ -254,6 +306,9 @@ void Forward(Image *MyImage,Image *MySino)
 			alpha=-costheta/sintheta;
 			for(r=0; r<R; r++ ) 
 			{
+
+        printf("Calculating r: %4d of %d \r",r, R-1);
+
 				beta=(r*Delta_rho+rho_min-rhooffset)/(Delta_x*sintheta);
 				betap=beta+0.5;
 				sum=0.0;
@@ -289,13 +344,15 @@ void Forward(Image *MyImage,Image *MySino)
 			alpha=-sintheta/costheta;
 			for(r=0; r<R; r++ ) 
 			{
+        printf("Calculating r (else): %4d of %d \r",r, R-1);
+
 				beta=(r*Delta_rho+rho_min-rhooffset)/(Delta_x*costheta);
-				betap=beta+0.5;
+				betap=beta+0.5;	// Not in that code
 				sum=0.0;
 				if (alpha>1e-6)
 				{
-					nmin=(int)ceil(-(beta+0.5-eps)/alpha);
-					nmax=1+(int)floor((M-0.5-beta-eps)/alpha);
+					nmin=(int)ceil(-(beta+0.5-eps)/alpha);	// Almost same
+					nmax=1+(int)floor((M-0.5-beta-eps)/alpha);	// Almost same
 				}
 				else 
 					if (alpha<-1e-6)
@@ -310,27 +367,42 @@ void Forward(Image *MyImage,Image *MySino)
 					}
 				if (nmin<0) nmin=0;
 				if (nmax>N) nmax=N;
-				mfloat=betap+nmin*alpha;
+				mfloat=betap+nmin*alpha;  // Negative value
+        printf("\n Debug inside 1");
+
 				for (n=nmin;n<nmax;n++)
 				{
+          printf("\n Debug inside 1.5: %d, %d", (int)mfloat, n);
 					sum+=signal[(int)mfloat][n];
 					mfloat+=alpha;
 				}
+        printf("\n Debug inside 2");
 				sino[t][r]=sum*Delta_x/fabs(costheta);
 			}
 		}
 	}
+
+  printf("Debug 3\n");
+
+  // vectorize(T, R, sino, sino_out);
+  for (int j = 0; j < R; ++j){
+      for (int i = 0; i < T; ++i){
+          sino_out[j * T + i] = sino[i][j];
+      }
+  }
+
+  printf("Debug 4\n");
+
+
+  FREE_MATRIX(signal);
+  FREE_MATRIX(sino);
+
 	Print(_DNormal,"\n Finished         \n");
 }
 
 
 
 
-
-void Forward_C_orig_dim()
-{
-  
-}
 
 
 
