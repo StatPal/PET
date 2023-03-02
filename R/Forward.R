@@ -29,6 +29,8 @@ Forward_R <- function(oData,
       setpar[7,1] <- RhoMin
       setpar[8,1] <- DeltaRho
       setpar[9,1] <- ThetaMin
+
+      print(setpar)
       
 
 

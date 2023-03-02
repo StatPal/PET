@@ -23,6 +23,9 @@
 #include <math.h>
 
 
+#include <stdlib.h>
+
+
 /******************** Main Routine C-Routine ********************/
 void radonLI(double *v,double *u,double *setpar)
 {
@@ -106,9 +109,13 @@ void radonLI(double *v,double *u,double *setpar)
     {
       dx_icostheta=Delta_x/fabs(costheta);        // DIFFERENT	// Not in that code
       alpha=-sintheta/costheta;                   // DIFFERENT
+
+      // if(t==0) printf("\n\n t: %d, alpha: %f, beta: %f", t, alpha, (0*Delta_rho+rho_min-rhooffset)/(Delta_x*costheta));
+
       for(r=0; r<R; r++ ) 
       {
-        beta=(r*Delta_rho+rho_min-rhooffset)/(Delta_x*costheta);    // DIFFERENT
+        beta=(r*Delta_rho+rho_min-rhooffset)/(Delta_x*costheta);    // DIFFERENT        
+        
         if (alpha>eps)
         {
           nmin=(int)ceil((eps-beta)/alpha);
@@ -133,6 +140,10 @@ void radonLI(double *v,double *u,double *setpar)
             }
         if (nmin<0) nmin=0;
         if (nmax>M) nmax=M;
+        
+        // printf("\n What!! t = %d, r = %d, beta: %f, M: %d, nmin, nmax: %d, %d", t, r, beta, M, nmin, nmax);
+
+
 
         sum=0.0;
         for (n=nmin;n<nmax;n++)
@@ -140,6 +151,10 @@ void radonLI(double *v,double *u,double *setpar)
           // Not in that code
           mfloat=beta+n*alpha;
           m=(int)mfloat;
+          
+          // if(t==0) printf("\n Debug inside 1.5: t: %d, %f, %d, %f", t, beta, n, alpha);
+          //printf("\n Debug inside 1.5: %f, %d, %f", beta, n, alpha);  // 1.093750, 0, -0.000000
+          // exit(0);
           reldx=(mfloat-m)*idx;
           adr=m+M*n;
           sum+=u[adr]*(1-reldx)+u[adr+1]*reldx;
