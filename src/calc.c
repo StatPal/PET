@@ -47,6 +47,11 @@ Backprojects the sinogram \tc{TestSinogram} onto \tc{Test}.
 Oct. 94, JJJ and PAP\\
 Feb. 95, JJJ, fixed minor bug.
 ******************************************************************************/
+
+
+// Backprojection is off by a pixel very often (for unit matrices)
+// Possible BUG
+// Is not happening for EM, but their BF, FB
 void BackProject(Image *Sinogram, Image *InvMyImage)
 {
   // Print(_DNormal," * Sinogram dimensions in Backproject 1\n: M:%i N:%i\n", Sinogram->M,Sinogram->N);

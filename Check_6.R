@@ -3,6 +3,7 @@
 ## Now checking with the C code images.
 
 library(PET)
+set.seed(1)
 
 # P <- matrix(0, 64, 64)
 P <- matrix(0, 128, 128)
@@ -30,9 +31,15 @@ final <- final/sum(final)
 
 
 
-rP_new <- newPoisson(P, nSample=1e7, ThetaSamples = 320, RhoSamples = 128, mode="LI")
+rP_new_old <- newPoisson(P, nSample=1e7, ThetaSamples = 320, RhoSamples = 128, mode="LI")
+# write(t(rP_new), file="PETcodes_Maitra/rP_new.dat")
+# rP_new <- matrix(scan("PETcodes_Maitra/rP_new.dat"), 320, byrow = T)
+# dim(rP_new)
+
+
 
 # rP_new <- y
+rP_new <- rP_new_old
 
 
 
@@ -110,3 +117,23 @@ rasterImage::rasterImage2(z=irP2_shrinked$irData/sum(irP2_shrinked$irData), main
 # rasterImage::rasterImage2(z=irP3$irData)
 rasterImage::rasterImage2(z=final, main = "Final estimate from previous code without smoothing")
 # rasterImage::rasterImage2(z=irP4)
+
+
+which(irP2_shrinked$irData==max(irP2_shrinked$irData), arr.ind = T)
+which(final==max(final), arr.ind = T)
+
+irP2_shrinked$irData[80:84,80:84]
+
+
+
+irP3 <- iradon(rP_new, nrow(P), ncol(P), mode="BF")
+BF_method <- which(irP3$irData==max(irP3$irData), arr.ind = T)
+
+irP3 <- iradon(rP_new, nrow(P), ncol(P), mode="FB")
+FB_method <- which(irP3$irData==max(irP3$irData), arr.ind = T)
+
+irP3 <- iradonIT(rP_new, nrow(P), ncol(P), mode="EM")
+EM_method <- which(irP3$irData==max(irP3$irData), arr.ind = T)
+
+
+cbind(BF_method, FB_method, EM_method)

@@ -34,6 +34,306 @@ void matricize(int m, int n, double **a, double *b){
 
 
 
+
+
+// void Forward(Image *MyImage,Image *MySino)
+// {
+// 	int t,r,m,n,mmin,mmax,nmin,nmax;
+// 	int T,R,M,N;
+// 	float sum,x_min,rhooffset,Delta_theta,Delta_rho,costheta,sintheta;
+// 	float rho_min,theta,alpha,beta,nfloat,mfloat;
+// 	float Delta_x,betap,eps;
+// 	float **signal,**sino;
+
+// 	eps=1e-4;
+// 	T=MySino->M;
+// 	R=MySino->N;
+// 	M=N=MyImage->M;
+
+// 	rho_min=MySino->Ymin;
+// 	Delta_theta=M_PI/T;
+// 	Delta_rho=MySino->DeltaY;
+
+// 	x_min=MyImage->Xmin;
+// 	Delta_x=MyImage->DeltaX;
+// 	signal=MyImage->Signal;
+// 	sino=MySino->Signal;
+
+// 	printf("Sino X=%i DX=%f Xmin=%f\n",MySino->M,MySino->DeltaX,MySino->Xmin);
+// 	printf("Sino Y=%i DY=%f Ymin=%f\n",MySino->N,MySino->DeltaY,MySino->Ymin);
+// 	printf("Image X=%i DX=%f Xmin=%f\n",MyImage->M,MyImage->DeltaX,MyImage->Xmin);
+// 	printf("Image Y=%i DY=%f Ymin=%f\n",MyImage->N,MyImage->DeltaY,MyImage->Ymin);
+
+// 	for(t=0; t<T;t++)
+// 	{
+// 		Print(_DNormal, "Calculating: %4d of %d \r",t,T-1);
+// 		theta=t*Delta_theta;
+// 		sintheta=sin(theta);
+// 		costheta=cos(theta);
+// 		rhooffset=x_min*(costheta+sintheta);
+// 		if (sintheta>sqrt(0.5))
+// 		{
+// 			alpha=-costheta/sintheta;
+// 			for(r=0; r<R; r++ ) 
+// 			{
+// 				beta=(r*Delta_rho+rho_min-rhooffset)/(Delta_x*sintheta);
+// 				betap=beta+0.5;
+// 				sum=0.0;
+// 				if (alpha>1e-6)
+// 				{
+// 					mmin=(int)ceil(-(beta+0.5-eps)/alpha);
+// 					mmax=1+(int)floor((N-0.5-beta-eps)/alpha);
+// 				}
+// 				else
+// 					if (alpha<-1e-6)
+// 					{
+// 						mmin=(int)ceil((N-0.5-beta-eps)/alpha);
+// 						mmax=1+(int)floor(-(beta+0.5-eps)/alpha);
+// 					}
+// 					else
+// 					{
+// 						mmin=0;
+// 						mmax=M;
+// 					}
+// 				if (mmin<0) mmin=0;
+// 				if (mmax>M) mmax=M;
+// 				nfloat=betap+mmin*alpha;
+// 				for (m=mmin;m<mmax;m++)
+// 				{
+// 					sum+=signal[m][(int)nfloat];
+// 					nfloat+=alpha;
+// 				}
+// 				sino[t][r]=sum*Delta_x/fabs(sintheta);
+// 			}
+// 		}
+// 		else
+// 		{
+// 			alpha=-sintheta/costheta;
+// 			for(r=0; r<R; r++ ) 
+// 			{
+// 				beta=(r*Delta_rho+rho_min-rhooffset)/(Delta_x*costheta);
+// 				betap=beta+0.5;
+// 				sum=0.0;
+// 				if (alpha>1e-6)
+// 				{
+// 					nmin=(int)ceil(-(beta+0.5-eps)/alpha);
+// 					nmax=1+(int)floor((M-0.5-beta-eps)/alpha);
+// 				}
+// 				else 
+// 					if (alpha<-1e-6)
+// 					{
+// 						nmin=(int)ceil((M-0.5-beta-eps)/alpha);
+// 						nmax=1+(int)floor(-(beta+0.5-eps)/alpha);
+// 					}
+// 					else
+// 					{
+// 						nmin=0;
+// 						nmax=N;
+// 					}
+// 				if (nmin<0) nmin=0;
+// 				if (nmax>N) nmax=N;
+// 				mfloat=betap+nmin*alpha;
+// 				for (n=nmin;n<nmax;n++)
+// 				{
+// 					sum+=signal[(int)mfloat][n];
+// 					mfloat+=alpha;
+// 				}
+// 				sino[t][r]=sum*Delta_x/fabs(costheta);
+// 			}
+// 		}
+// 	}
+// 	Print(_DNormal,"\n Finished         \n");
+// }
+
+
+
+
+
+// void Forward_C_orig_dim(double *InImage, double *OutImage, 
+//                       char **mode, int *InterPol , char **FilterTyp, char **DebugLevel, double *Xmin, double *Ymin, 
+//                       double *DeltaX, double *DeltaY, int *M, int *N, int *XSamples, int *YSamples)
+// {
+//   Image *NewImage;
+//   ReadIradonArgs("RadonData",*mode, *DebugLevel, InterPol, *FilterTyp, Xmin, Ymin, DeltaX, DeltaY, XSamples, YSamples); 
+
+//   // initialization of radon-image
+//   NewImage=NewFloatImage(IniFile.InFile, *M, *N,_RealArray);
+//   RDoubleToImage(NewImage, InImage, *M, *N );
+//   InitImage(NewImage);
+  
+
+//   // Instead of Backfilter
+//   int i,m,n,OldHeight,OldWidth,XSamples1,YSamples1;
+//   // Image *InvMyImage, *NewImagecpy;
+  
+//   OldHeight=IniFile.XSamples;
+//   OldWidth =IniFile.YSamples;
+//   XSamples1=IniFile.XSamples;
+//   YSamples1=IniFile.YSamples;
+
+
+//   Image *MySino;
+
+//   /* Allocate new image, and put transformation parameters in it*/
+//   MySino=NewFloatImage("RecImage",XSamples1,YSamples1,_RealArray);  // Change
+//   MySino->Xmin=IniFile.Xmin;
+//   MySino->Ymin=IniFile.Ymin;
+//   MySino->DeltaX=IniFile.DeltaX;
+//   MySino->DeltaY=IniFile.DeltaY;
+
+
+//   // NewImagecpy = CopyImage(NewImage);  // NewImagecpy = NewImage;  // Both changes  
+//   // Print(_DNormal,"\nOriginal NewImage dimensions: M:%i N:%i\n",NewImage->M,NewImage->N);  // 320x135
+//   // BackProject(NewImage,InvMyImage);
+//   // Print(_DNormal,"Original NewImage dimensions: M:%i N:%i\n",NewImage->M,NewImage->N);  // 320x157
+  
+//   Forward(NewImage, MySino);
+
+//   ImageToFloat(OutImage, MySino);  // NEW output to R
+//   // Do it by hand
+
+//   FreeImage(MySino);
+
+//   Print(_DNormal,"return to R.          \n");
+// }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+void Forward(Image *MyImage,Image *MySino)
+{
+	int t,r,m,n,mmin,mmax,nmin,nmax;
+	int T,R,M,N;
+	float sum,x_min,rhooffset,Delta_theta,Delta_rho,costheta,sintheta;
+	float rho_min,theta,alpha,beta,nfloat,mfloat;
+	float Delta_x,betap,eps;
+	float **signal,**sino;
+
+	eps=1e-4;
+	T=MySino->M;
+	R=MySino->N;
+	M=N=MyImage->M;
+
+	rho_min=MySino->Ymin;
+	Delta_theta=M_PI/T;
+	Delta_rho=MySino->DeltaY;
+
+	x_min=MyImage->Xmin;
+	Delta_x=MyImage->DeltaX;
+	signal=MyImage->Signal;
+	sino=MySino->Signal;
+
+	printf("Sino X=%i DX=%f Xmin=%f\n",MySino->M,MySino->DeltaX,MySino->Xmin);
+	printf("Sino Y=%i DY=%f Ymin=%f\n",MySino->N,MySino->DeltaY,MySino->Ymin);
+	printf("Image X=%i DX=%f Xmin=%f\n",MyImage->M,MyImage->DeltaX,MyImage->Xmin);
+	printf("Image Y=%i DY=%f Ymin=%f\n",MyImage->N,MyImage->DeltaY,MyImage->Ymin);
+
+	for(t=0; t<T;t++)
+	{
+		Print(_DNormal, "Calculating: %4d of %d \r",t,T-1);
+		theta=t*Delta_theta;
+		sintheta=sin(theta);
+		costheta=cos(theta);
+		rhooffset=x_min*(costheta+sintheta);
+		if (sintheta>sqrt(0.5))
+		{
+			alpha=-costheta/sintheta;
+			for(r=0; r<R; r++ ) 
+			{
+				beta=(r*Delta_rho+rho_min-rhooffset)/(Delta_x*sintheta);
+				betap=beta+0.5;
+				sum=0.0;
+				if (alpha>1e-6)
+				{
+					mmin=(int)ceil(-(beta+0.5-eps)/alpha);
+					mmax=1+(int)floor((N-0.5-beta-eps)/alpha);
+				}
+				else
+					if (alpha<-1e-6)
+					{
+						mmin=(int)ceil((N-0.5-beta-eps)/alpha);
+						mmax=1+(int)floor(-(beta+0.5-eps)/alpha);
+					}
+					else
+					{
+						mmin=0;
+						mmax=M;
+					}
+				if (mmin<0) mmin=0;
+				if (mmax>M) mmax=M;
+				nfloat=betap+mmin*alpha;
+				for (m=mmin;m<mmax;m++)
+				{
+					sum+=signal[m][(int)nfloat];
+					nfloat+=alpha;
+				}
+				sino[t][r]=sum*Delta_x/fabs(sintheta);
+			}
+		}
+		else
+		{
+			alpha=-sintheta/costheta;
+			for(r=0; r<R; r++ ) 
+			{
+				beta=(r*Delta_rho+rho_min-rhooffset)/(Delta_x*costheta);
+				betap=beta+0.5;
+				sum=0.0;
+				if (alpha>1e-6)
+				{
+					nmin=(int)ceil(-(beta+0.5-eps)/alpha);
+					nmax=1+(int)floor((M-0.5-beta-eps)/alpha);
+				}
+				else 
+					if (alpha<-1e-6)
+					{
+						nmin=(int)ceil((M-0.5-beta-eps)/alpha);
+						nmax=1+(int)floor(-(beta+0.5-eps)/alpha);
+					}
+					else
+					{
+						nmin=0;
+						nmax=N;
+					}
+				if (nmin<0) nmin=0;
+				if (nmax>N) nmax=N;
+				mfloat=betap+nmin*alpha;
+				for (n=nmin;n<nmax;n++)
+				{
+					sum+=signal[(int)mfloat][n];
+					mfloat+=alpha;
+				}
+				sino[t][r]=sum*Delta_x/fabs(costheta);
+			}
+		}
+	}
+	Print(_DNormal,"\n Finished         \n");
+}
+
+
+
+
+
+void Forward_C_orig_dim()
+{
+  
+}
+
+
+
 /* 
 What is the extra in this function than BackProject??
 
